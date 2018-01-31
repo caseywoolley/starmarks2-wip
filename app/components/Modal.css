@@ -1,0 +1,182 @@
+/* @import 'reset-css/reset.css'; #pkt_ext_master */
+html, #pkt_ext_master body, #pkt_ext_master div, #pkt_ext_master span, #pkt_ext_master applet, #pkt_ext_master object, #pkt_ext_master iframe,
+#pkt_ext_master h1, #pkt_ext_master h2, #pkt_ext_master h3, #pkt_ext_master h4, #pkt_ext_master h5, #pkt_ext_master h6, #pkt_ext_master p, #pkt_ext_master blockquote, #pkt_ext_master pre,
+#pkt_ext_master a, #pkt_ext_master abbr, #pkt_ext_master acronym, #pkt_ext_master address, #pkt_ext_master big, #pkt_ext_master cite, #pkt_ext_master code,
+#pkt_ext_master del, #pkt_ext_master dfn, #pkt_ext_master em, #pkt_ext_master img, #pkt_ext_master ins, #pkt_ext_master kbd, #pkt_ext_master q, #pkt_ext_master s, #pkt_ext_master samp,
+#pkt_ext_master small, #pkt_ext_master strike, #pkt_ext_master strong, #pkt_ext_master sub, #pkt_ext_master sup, #pkt_ext_master tt, #pkt_ext_master var,
+#pkt_ext_master b, #pkt_ext_master u, #pkt_ext_master i, #pkt_ext_master center,
+#pkt_ext_master dl, #pkt_ext_master dt, #pkt_ext_master dd, #pkt_ext_master ol, #pkt_ext_master ul, #pkt_ext_master li,
+#pkt_ext_master fieldset, #pkt_ext_master form, #pkt_ext_master label, #pkt_ext_master legend,
+#pkt_ext_master table, #pkt_ext_master caption, #pkt_ext_master tbody, #pkt_ext_master tfoot, #pkt_ext_master thead, #pkt_ext_master tr, #pkt_ext_master th, #pkt_ext_master td,
+#pkt_ext_master article, #pkt_ext_master aside, #pkt_ext_master canvas, #pkt_ext_master details, #pkt_ext_master embed, 
+#pkt_ext_master figure, #pkt_ext_master figcaption, #pkt_ext_master footer, #pkt_ext_master header, #pkt_ext_master hgroup, 
+#pkt_ext_master menu, #pkt_ext_master nav, #pkt_ext_master output, #pkt_ext_master ruby, #pkt_ext_master section, #pkt_ext_master summary,
+#pkt_ext_master time, #pkt_ext_master mark, #pkt_ext_master audio, #pkt_ext_master video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+#pkt_ext_master article, #pkt_ext_master aside, #pkt_ext_master details, #pkt_ext_master figcaption, #pkt_ext_master figure, 
+#pkt_ext_master footer, #pkt_ext_master header, #pkt_ext_master hgroup, #pkt_ext_master menu, #pkt_ext_master nav, #pkt_ext_master section {
+	display: block;
+}
+#pkt_ext_master body {
+	line-height: 1;
+}
+#pkt_ext_master ol, #pkt_ext_master ul {
+	list-style: none;
+}
+#pkt_ext_master blockquote, #pkt_ext_master q {
+	quotes: none;
+}
+#pkt_ext_master blockquote:before, #pkt_ext_master blockquote:after,
+#pkt_ext_master q:before, #pkt_ext_master q:after {
+	content: '';
+	content: none;
+}
+#pkt_ext_master table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*-------------------------- end reset   --------------------- */
+
+
+
+#pkt_ext_master {
+  background: red;
+  font-family: proxima-nova, HelveticaNeue, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 100%;
+  font-weight: normal;
+  z-index: 2147483647;
+  position: fixed;
+  top: 0px;
+  right: 0px;
+}
+
+#pkt_ext_master, #pkt_ext_newtab {
+  all: initial;
+}
+
+#pkt_ext_master div {
+  display: block;
+}
+
+#pkt_ext_master.pkt_ext_container_inactive .pkt_ext_component_save {
+  transform: translate3d(0px, 130%, 0px);
+}
+
+#pkt_ext_master .pkt_ext_component_save {
+  position: fixed;
+  right: 10px;
+  top: 10px;
+  transform: translate3d(0px, 0px, 0px);
+  z-index: 2147483646;
+  overflow: visible;
+  padding: 0px 3px 3px;
+  transition: all 0.2s ease-in-out;
+}
+
+#pkt_ext_master .pkt_ext_save_details {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 260px;
+  z-index: 2147483647;
+  padding: 10px;
+}
+
+#pkt_ext_master .pkt_ext_platter {
+  background-color: rgb(243, 243, 243);
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 6px;
+  position: relative;
+  text-shadow: none;
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgb(255, 255, 255);
+  border-image: initial;
+  border-radius: 4px;
+}
+
+
+
+/*https://coolors.co/app/e3e6ef-666a86-2b4162-ecc8af-f28f3b*/
+@import url(https://fonts.googleapis.com/css?family=Lobster);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300);
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css?family=FontAwesome);
+
+
+.actionButtons {
+  display: none !important;
+}
+
+#modal {
+  background: rgba(0, 0, 0, 0.7);
+  bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  outline: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2147483647;
+  -webkit-overflow-scrolling: touch;
+}
+.modalInner {
+  box-sizing: border-box;
+  margin: auto;
+  padding: 30px 0;
+  position: relative;
+}
+
+.modalContent {
+  background-color: black;
+  border-radius: 5px;
+  padding: 20px;
+  min-width: 500px;
+  line-height: 2em;
+}
+
+/****** Style Star Rating Widget *****/
+
+.rating { 
+  border: none;
+  margin: 0px;
+  padding: 0px;
+}
+
+.rating > input { display: none; } 
+.rating > label:before { 
+  margin: .05em;
+  font-size: 45px;
+  font-family: FontAwesome;
+  display: inline-block;
+  content: "\f005";
+}
+
+.rating > label { 
+  color: #ddd; 
+  float: right; 
+}
+
+/***** CSS Magic to Highlight Stars on Hover *****/
+
+.rating > input:checked ~ label, /* show gold star when clicked */
+.rating:not(:checked) > label:hover, /* hover current star */
+.rating:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+
+.rating > input:checked + label:hover, /* hover current star when changing rating */
+.rating > input:checked ~ label:hover,
+.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
+.rating > input:checked ~ label:hover ~ label { color: #FFED85;  } 

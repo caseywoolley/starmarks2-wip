@@ -28,10 +28,7 @@ function popWindow(type) {
 chrome.contextMenus.create({
   id: CONTEXT_MENU_ID,
   title: 'React Chrome Extension Example',
-  contexts: ['all'],
-  documentUrlPatterns: [
-    'https://github.com/*'
-  ]
+  contexts: ['all']
 });
 
 chrome.contextMenus.onClicked.addListener((event) => {

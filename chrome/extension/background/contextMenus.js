@@ -9,19 +9,22 @@ function closeIfExist() {
 }
 
 function popWindow(type) {
-  closeIfExist();
+  // closeIfExist();
   const options = {
-    type: 'popup',
-    left: 100,
-    top: 100,
-    width: 800,
-    height: 475,
+    // type: 'popup',
+    // left: 100,
+    // top: 100,
+    // width: 800,
+    // height: 475,
   };
   if (type === 'open') {
     options.url = 'window.html';
-    chrome.windows.create(options, (win) => {
-      windowId = win.id;
+    chrome.tabs.create(options, (win) => {
+      // windowId = win.id;
     });
+    // chrome.windows.create(options, (win) => {
+    //   windowId = win.id;
+    // });
   }
 }
 

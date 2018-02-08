@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
-import todos from './todos';
+import starmarks from './todos';
 
 export default combineReducers({
-  todos
+  starmarks
 });

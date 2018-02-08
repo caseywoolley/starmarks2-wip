@@ -19,6 +19,8 @@ function promisifyAll(obj, list) {
 
 // let chrome extension api support Promise
 promisifyAll(chrome, [
+  'bookmarks',
+  'history',
   'tabs',
   'windows',
   'browserAction',
@@ -31,4 +33,4 @@ promisifyAll(chrome.storage, [
 require('./background/contextMenus');
 require('./background/inject');
 require('./background/badge');
-require('./background/popup');
+// require('./background/popup');

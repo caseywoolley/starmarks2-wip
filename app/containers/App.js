@@ -1,14 +1,27 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import Header from '../components/Header';
-import MainSection from '../components/MainSection';
+// import Header from '../components/Header';
+// import MainSection from '../components/MainSection';
+import Starmark from '../components/Starmark';
+import StarList from '../components/StarList';
 import * as TodoActions from '../actions/todos';
 import style from './App.css';
 
+const isPopup = window.location.pathname === '/popup.html';
+let activeTab;
+chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+  activeTab = tabs[0];
+  chrome.history.search({ text: activeTab.url }, (history) => {
+    console.log('history', history)
+    activeTab.lastVisitTime = history.lastVisitTime;
+    activeTab.visitCount = history.visitCount;
+  });
+});
+// const openWindow = chrome.tabs.create.bind(null, { url: 'window.html' });
 @connect(
   state => ({
-    todos: state.todos
+    starmarks: state.starmarks
   }),
   dispatch => ({
     actions: bindActionCreators(TodoActions, dispatch)
@@ -17,17 +30,29 @@ import style from './App.css';
 export default class App extends Component {
 
   static propTypes = {
-    todos: PropTypes.array.isRequired,
+    starmarks: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired
   };
 
-  render() {
-    const { todos, actions } = this.props;
+  seeStars() {
+    chrome.tabs.create({ url: 'window.html' });
+  }
 
+  render() {
+    const { starmarks, actions } = this.props;
+    const starmark = starmarks[activeTab.url] || activeTab;
     return (
-      <div className={style.normal}>
-        <Header addTodo={actions.addTodo} />
-        <MainSection todos={todos} actions={actions} />
+      <div className={style.container}>
+        {/* <Header addTodo={actions.addTodo} /> */}
+        {/* <MainSection todos={todos} actions={actions} /> */}
+        { !isPopup && <StarList starmarks={starmarks} addStarmark={actions.addStarmark} /> }
+        <div className={style.popup}>
+          <Starmark
+            starmark={{ title: starmark.title, rating: starmark.rating, url: activeTab.url }}
+            addStarmark={actions.addStarmark}
+          />
+          { isPopup && <button onClick={this.seeStars}>Explore Starmarks</button>}
+        </div>
       </div>
     );
   }

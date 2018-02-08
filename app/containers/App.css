@@ -1,4 +1,25 @@
 /* .normal {
+  background-color: rgb(96, 133, 252);
+} */
+
+body {
+  background-color: rgb(243, 243, 243);
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
+}
+
+/* .normal {
   background: #fff;
   margin: 200px 0 40px 0;
   position: relative;

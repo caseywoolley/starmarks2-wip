@@ -1,86 +1,53 @@
-import React, { Component, PropTypes } from 'react';
-import classnames from 'classnames';
-import StarInput from './StarInput';
-import style from './TodoItem.css';
+import _uniqueId from 'lodash/uniqueId';
+import React, { PropTypes, Component } from 'react';
+import style from './Starmark.css';
 
 export default class Starmark extends Component {
 
   static propTypes = {
+    addStarmark: PropTypes.func.isRequired,
     starmark: PropTypes.object.isRequired,
-    editStarmark: PropTypes.func.isRequired,
-    deleteStarmark: PropTypes.func.isRequired,
-    updateStarmark: PropTypes.func.isRequired
   };
 
-  constructor(props, context) {
-    super(props, context);
+  constructor(props) {
+    super(props);
     this.state = {
-      editing: false
+      rating: 0,
+      isVisible: false
     };
   }
 
-  handleSave = (text) => {
-    const { starmark, deleteStarmark, editStarmark } = this.props;
-    if (text.length === 0) {
-      deleteStarmark(starmark.id);
-    } else {
-      editStarmark(starmark.id, text);
-    }
-    this.setState({ editing: false });
+  componentWillMount() {
+    this.setState({ rating: this.props.starmark.rating });
+  }
+
+  buttonOnClick = () => {
+    this.setState({ isVisible: !this.state.isVisible });
   };
 
-  handleUpdate = () => {
-    const { starmark, updateStarmark } = this.props;
-    updateStarmark(starmark.id);
-  };
-
-  handleDelete = () => {
-    const { starmark, deleteStarmark } = this.props;
-    deleteStarmark(starmark.id);
-  };
+  handleChange = (e) => {
+    const rating = e.target.value;
+    this.setState({ rating });
+    this.props.addStarmark({
+      ...this.props.starmark,
+      rating
+    });
+  }
 
   render() {
-    const { starmark } = this.props;
-
-    let element;
-    if (this.state.editing) {
-      element = (
-        <TodoTextInput
-          text={starmark.text}
-          editing={this.state.editing}
-          onSave={this.handleSave}
-        />
-      );
-    } else {
-      element = (
-        <div className={style.view}>
-          <input
-            className={style.toggle}
-            type="checkbox"
-            checked={starmark.completed}
-            onChange={this.handleComplete}
-          />
-          <label onDoubleClick={this.handleDoubleClick}>
-            {starmark.text}
-          </label>
-          <button
-            className={style.destroy}
-            onClick={this.handleDelete}
-          />
-        </div>
-      );
-    }
-
+    const id = _uniqueId();
+    const ratingInput = i => <input type="radio" checked={this.state.rating === i.toString()} onChange={this.handleChange} id={`star${i}-${id}`} value={i} />;
+    const ratingLabel = i => <label htmlFor={`star${i}-${id}`} title={`${i} stars`} />;
     return (
-      <li
-        className={classnames({
-          [style.completed]: starmark.completed,
-          [style.editing]: this.state.editing,
-          [style.normal]: !this.state.editing
-        })}
-      >
-        {element}
-      </li>
+      <div className={style.container}>
+        <div className={style.rating} name={`rating-${id}`} id={`rating-${id}`}>
+          {ratingInput(5)}{ratingLabel(5)}
+          {ratingInput(4)}{ratingLabel(4)}
+          {ratingInput(3)}{ratingLabel(3)}
+          {ratingInput(2)}{ratingLabel(2)}
+          {ratingInput(1)}{ratingLabel(1)}
+        </div>
+      </div>
     );
   }
 }

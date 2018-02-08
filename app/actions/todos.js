@@ -1,5 +1,9 @@
 import * as types from '../constants/ActionTypes';
 
+export function addStarmark(starmark) {
+  return { type: types.ADD_STARMARK, starmark };
+}
+
 export function addTodo(text) {
   return { type: types.ADD_TODO, text };
 }

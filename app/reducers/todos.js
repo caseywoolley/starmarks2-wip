@@ -1,20 +1,13 @@
 import * as ActionTypes from '../constants/ActionTypes';
 
-const initialState = {
-  testurl: {
-    title: 'test',
-    rating: '1'
-  }
-};
+const initialState = {};
 
 const actionsMap = {
   [ActionTypes.ADD_STARMARK](state, action) {
+    const { starmark } = action;
     return {
       ...state,
-      [action.starmark.url]: {
-        title: action.starmark.title,
-        rating: action.starmark.rating
-      }
+      [starmark.url]: starmark
     };
   },
   // [ActionTypes.EDIT_STARMARK](state, action) {

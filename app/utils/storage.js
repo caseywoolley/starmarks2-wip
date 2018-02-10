@@ -1,27 +1,11 @@
 // function saveState(state) {
 //   chrome.storage.local.set({ state: JSON.stringify(state) });
 // }
+import { saveState } from './bookmarkStorage';
 
-const storageBookmarkTitle = 'starmarksData';
-const bookmarkBarId = '1';
-const defaultStorageBookmark = {
-  parentId: bookmarkBarId,
-  title: storageBookmarkTitle,
-  url: 'http://www.starmarks.com?data={}'
-};
 
-function saveState(state) {
-  chrome.bookmarks.search({ title: storageBookmarkTitle }, (result) => {
-    result[0] ? updateExistingStorage(result[0], state) : createNewStorage(state);
-  });
-}
-
-function updateExistingStorage(store, state) {
-  chrome.bookmarks.update(store.id.toString(), { url: `http://starmarks.com?data=${JSON.stringify(state)}` });
-}
-
-function createNewStorage(state) {
-  chrome.bookmarks.create(defaultStorageBookmark, updateExistingStorage.bind(state));
+function udpateHistory(starmarks) {
+  // update history for all ? expensive?
 }
 
 // todos unmarked count

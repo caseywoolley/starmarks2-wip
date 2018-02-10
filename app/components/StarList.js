@@ -1,10 +1,9 @@
 import React, { PropTypes, Component } from 'react';
-import Starmark from '../components/Starmark';
-
-import style from './StarList.css';
 import _map from 'lodash/map';
 import _uniqueId from 'lodash/uniqueId';
-
+import style from './StarList.css';
+import timeSince from '../utils/timeSince';
+import Starmark from '../components/Starmark';
 
 export default class StarList extends Component {
 
@@ -19,12 +18,15 @@ export default class StarList extends Component {
   }
 
   render() {
-    const { starmarks, addStarmark } = this.props;
+    const { addStarmark } = this.props;
     return (
       <div className={style.starlist}>
-        { _map(starmarks, (starmark, url) => (
+        { _map(this.props.starmarks, (starmark, url) => (
           <div key={_uniqueId()}>
             <span>{starmark.title}</span>
+            <span><a href={url} rel="noopener noreferrer" target="_blank">{url}</a></span>
+            <span>{timeSince(starmark.lastVisitTime)}</span>
+            <span>{starmark.visitCount}</span>
             <span className={style.starmark}>
               <Starmark starmark={{ ...starmark, url }} addStarmark={addStarmark} />
             </span>

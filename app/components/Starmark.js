@@ -26,11 +26,13 @@ export default class Starmark extends Component {
   };
 
   handleChange = (e) => {
+    const { addStarmark, starmark } = this.props;
     const rating = e.target.value;
+    const { url, title } = starmark;
     this.setState({ rating });
-    this.props.addStarmark({
-      ...this.props.starmark,
-      rating
+    chrome.history.search({ text: url }, (history) => {
+      const { visitCount = 0, lastVisitTime } = history[0] || {};
+      addStarmark({ url, title, visitCount, lastVisitTime, rating });
     });
   }
 

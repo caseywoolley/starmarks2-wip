@@ -2,6 +2,10 @@
 
 }
 
+.starlist span {
+  padding: 5px;
+}
+
 .starmark {
   font-size: 20px;
 }

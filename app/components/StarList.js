@@ -1,9 +1,27 @@
 import React, { PropTypes, Component } from 'react';
+import Waypoint from 'react-waypoint';
 import _map from 'lodash/map';
 import _uniqueId from 'lodash/uniqueId';
 import style from './StarList.css';
 import timeSince from '../utils/timeSince';
 import Starmark from '../components/Starmark';
+
+const toArrayWithKeys = obj => _map(obj, (value, key) => ({ key, ...value }));
+
+const starItems = ({ starmarks, addStarmark }, { displayLimit }) => (
+  _map(toArrayWithKeys(starmarks).slice(0, displayLimit), starmark => (
+    <div key={_uniqueId()}>
+      <span>{starmark.title}</span>
+      <span><a href={starmark.url} rel="noopener noreferrer" target="_blank">{starmark.url}</a></span>
+      <span>{timeSince(starmark.lastVisitTime)}</span>
+      <span>{starmark.visitCount}</span>
+      <span className={style.starmark}>
+        <Starmark starmark={starmark} addStarmark={addStarmark} />
+      </span>
+    </div>
+    )
+  )
+);
 
 export default class StarList extends Component {
 
@@ -14,25 +32,23 @@ export default class StarList extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      displayStart: 0,
+      displayLimit: 10
+    };
+  }
+
+  loadMore = () => {
+    this.setState({
+      displayLimit: this.state.displayLimit + 10
+    });
   }
 
   render() {
-    const { addStarmark } = this.props;
     return (
       <div className={style.starlist}>
-        { _map(this.props.starmarks, (starmark, url) => (
-          <div key={_uniqueId()}>
-            <span>{starmark.title}</span>
-            <span><a href={url} rel="noopener noreferrer" target="_blank">{url}</a></span>
-            <span>{timeSince(starmark.lastVisitTime)}</span>
-            <span>{starmark.visitCount}</span>
-            <span className={style.starmark}>
-              <Starmark starmark={{ ...starmark, url }} addStarmark={addStarmark} />
-            </span>
-          </div>
-        )
-      ) }
+        {starItems(this.props, this.state)}
+        <Waypoint onEnter={this.loadMore} />
       </div>
     );
   }

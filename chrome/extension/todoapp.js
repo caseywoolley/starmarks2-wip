@@ -48,15 +48,16 @@ chrome.bookmarks.search({
 }, (result) => {
   if (result[0] && result[0].url) {
     const dataString = result[0].url.split('?data=')[1];
-    renderApp(JSON.parse(decodeURI(dataString)));
+    debugger
+    renderApp(JSON.parse(decodeURIComponent(dataString)));
   } else {
     chrome.bookmarks.getTree((nodes) => {
       treeToHash(nodes, (data) => {
         const newState = { starmarks: data };
         chrome.bookmarks.create({
           parentId: bookmarkBarId,
-          title: 'starmarksData',
-          url: `http://www.starmarks.com?data=${JSON.stringify(newState)}`
+          title: storageBookmarkTitle,
+          url: `http://www.starmarks.com?data=${encodeURIComponent(JSON.stringify(newState))}`
         }, () => {
           renderApp(newState);
         });

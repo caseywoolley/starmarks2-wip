@@ -2,17 +2,40 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from '../../app/containers/Root';
 import './todoapp.css';
+import _forEach from 'lodash/forEach';
 // import { createNewStorage } from '../../app/utils/bookmarkStorage';
 
-// https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/901144#901144
-const getParameterByName = (name, url) => {
-  const match = RegExp(`${name}=([^&]*)`).exec(url.split('?')[1]);
-  return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+const treeHashToStarmarks = (treeHash) => {
+  const starMarks = {};
+  let limit = 100;
+  _forEach(treeHash, (val, key) => {
+    // if (limit > 0) {
+      starMarks[key] = { title: val.title, url: key };
+      limit -= 1;
+    // }
+  });
+  console.log(starMarks)
+  return starMarks;
 };
+
+const treeToHash = (nodes, callback) => {
+  let nodeHash = {};
+  let childHash;
+  nodes.forEach((node) => {
+    childHash = node.children ? treeToHash(node.children) : {};
+    if (node.url) {
+      nodeHash[node.url || node.title || 'top'] = node;
+    }
+    nodeHash = { ...nodeHash, ...childHash };
+  });
+  if (callback) { callback(treeHashToStarmarks(nodeHash)); }
+  return nodeHash;
+};
+
 const storageBookmarkTitle = 'starmarksData';
 const bookmarkBarId = '1';
 const renderApp = (state) => {
-  const initialState = JSON.parse(state || '{}');
+  const initialState = state || {};
   const createStore = require('../../app/store/configureStore');
 
   ReactDOM.render(
@@ -20,22 +43,31 @@ const renderApp = (state) => {
     document.querySelector('#root')
   );
 };
-
 chrome.bookmarks.search({
   title: storageBookmarkTitle
 }, (result) => {
   if (result[0] && result[0].url) {
-    renderApp(decodeURIComponent(result[0].url.split('?data=')[1]));
-  }
-
-  if (!result[0]) {
-    chrome.bookmarks.create({
-      parentId: bookmarkBarId,
-      title: 'starmarksData',
-      url: 'http://www.starmarks.com?data={}'
-    }, (newBookmark) => {
-      // renderApp(getParameterByName('data', newBookmark.url));
-      renderApp(decodeURIComponent(newBookmark.url.split('?data=')[1]));
+    const dataString = result[0].url.split('?data=')[1];
+    renderApp(JSON.parse(decodeURI(dataString)));
+  } else {
+    chrome.bookmarks.getTree((nodes) => {
+      treeToHash(nodes, (data) => {
+        const newState = { starmarks: data };
+        chrome.bookmarks.create({
+          parentId: bookmarkBarId,
+          title: 'starmarksData',
+          url: `http://www.starmarks.com?data=${JSON.stringify(newState)}`
+        }, () => {
+          renderApp(newState);
+        });
+      });
     });
   }
 });
+
+
+// chrome.bookmarks.getTree((nodes) => {
+//   treeToHash(nodes, (treeHash) => {
+
+//   });
+// });

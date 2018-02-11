@@ -4,6 +4,7 @@
 
 .starlist span {
   padding: 5px;
+  word-break: break-all;
 }
 
 .starmark {

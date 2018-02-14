@@ -1,12 +1,24 @@
-import _uniqueId from 'lodash/uniqueId';
 import React, { PropTypes, Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import _uniqueId from 'lodash/uniqueId';
+import * as TodoActions from '../actions/todos';
+
 import style from './Starmark.css';
 
+
+@connect(
+  state => ({ ...state }),
+  dispatch => ({
+    actions: bindActionCreators(TodoActions, dispatch)
+  })
+)
 export default class Starmark extends Component {
 
   static propTypes = {
-    addStarmark: PropTypes.func.isRequired,
+    // addStarmark: PropTypes.func.isRequired,
     starmark: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired
   };
 
   constructor(props) {
@@ -26,13 +38,13 @@ export default class Starmark extends Component {
   };
 
   handleChange = (e) => {
-    const { addStarmark, starmark } = this.props;
+    const { actions, starmark } = this.props;
     const rating = e.target.value;
     const { url, title } = starmark;
     this.setState({ rating });
     chrome.history.search({ text: url }, (history) => {
       const { visitCount = 0, lastVisitTime } = history[0] || {};
-      addStarmark({ url, title, visitCount, lastVisitTime, rating });
+      actions.addStarmark({ url, title, visitCount, lastVisitTime, rating });
     });
   }
 

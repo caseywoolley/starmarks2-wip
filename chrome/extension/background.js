@@ -1,3 +1,4 @@
+import { saveState } from '../../app/utils/bookmarkStorage';
 const bluebird = require('bluebird');
 
 global.Promise = bluebird;
@@ -33,4 +34,31 @@ promisifyAll(chrome.storage, [
 require('./background/contextMenus');
 require('./background/inject');
 require('./background/badge');
+
+console.log('background')
+
+chrome.history.onVisited.addListener((history) => {
+  console.log(history)
+  if (!starmarks[history.url]) return;
+  const starmark = starmarks[history.url];
+  const { visitCount, lastVisitTime } = history;
+  actions.addStarmark({
+    ...starmark,
+    visitCount,
+    lastVisitTime
+  });
+});
 // require('./background/popup');
+// chrome.tabs.getCurrent()
+//   .then((tab) => {
+//     actions.addStarmark({
+//       ...starmark,
+//       visitCount,
+//       lastVisitTime
+//     });
+//   });
+
+// chrome.history.search({ text: starmark.url }, (history) => {
+//   console.log(history)
+//   const { visitCount, lastVisitTime } = history[0] || {};
+// });

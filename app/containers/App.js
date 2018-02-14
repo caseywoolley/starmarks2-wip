@@ -12,31 +12,8 @@ const isPopup = window.location.pathname === '/popup.html';
 let activeTab;
 chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
   activeTab = tabs[0];
-  // chrome.history.search({ text: activeTab.url }, (history) => {
-  //   console.log('history', history)
-  //   activeTab.lastVisitTime = history.lastVisitTime;
-  //   activeTab.visitCount = history.visitCount;
-  // });
 });
 
-chrome.history.onVisited.addListener((history) => {
-  // find a place for this wher has access to starmarks object and addStarmarks action
-  // update starmark
-});
-
-const decorateHistory = (starmark) => {
-  if (!starmark.url) return starmark;
-  return chrome.history.search({ text: starmark.url }, (history) => {
-    const { visitCount, lastVisitTime } = history;
-    return {
-      ...starmark,
-      visitCount,
-      lastVisitTime
-    };
-  });
-};
-
-// const openWindow = chrome.tabs.create.bind(null, { url: 'window.html' });
 @connect(
   state => ({
     starmarks: state.starmarks
@@ -53,20 +30,21 @@ export default class App extends Component {
   };
 
   componentDidMount() {
-    const { starmarks, actions } = this.props;
-    chrome.history.onVisited.addListener((history) => {
-      if (!starmarks[history.url]) return;
-      const starmark = starmarks[history.url];
-      const { visitCount, lastVisitTime } = history;
-      actions.addStarmark({
-        ...starmark,
-        visitCount,
-        lastVisitTime
-      });
-    });
+    // const { starmarks, actions } = this.props;
+    // chrome.history.onVisited.addListener((history) => {
+    //   console.log(history)
+    //   if (!starmarks[history.url]) return;
+    //   const starmark = starmarks[history.url];
+    //   const { visitCount, lastVisitTime } = history;
+    //   actions.addStarmark({
+    //     ...starmark,
+    //     visitCount,
+    //     lastVisitTime
+    //   });
+    // });
   }
 
-  seeStars() {
+  seeStars = () => {
     chrome.tabs.create({ url: 'window.html' });
   }
 
@@ -75,9 +53,7 @@ export default class App extends Component {
     const starmark = starmarks[activeTab.url] || activeTab;
     return (
       <div className={style.container}>
-        {/* <Header addTodo={actions.addTodo} /> */}
-        {/* <MainSection todos={todos} actions={actions} /> */}
-        { !isPopup && <StarList starmarks={starmarks} addStarmark={actions.addStarmark} /> }
+        { !isPopup && <StarList starmarks={starmarks} actions={actions} /> }
         <div className={style.popup}>
           <Starmark
             starmark={{ title: starmark.title, rating: starmark.rating, url: activeTab.url }}

@@ -1,11 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import * as TodoActions from '../actions/todos';
+import { addVisitListener } from '../../app/utils/bookmarkStorage';
+
 // import Header from '../components/Header';
 // import MainSection from '../components/MainSection';
 import Starmark from '../components/Starmark';
 import StarList from '../components/StarList';
-import * as TodoActions from '../actions/todos';
 import style from './App.css';
 
 const isPopup = window.location.pathname === '/popup.html';
@@ -31,17 +33,7 @@ export default class App extends Component {
 
   componentDidMount() {
     // const { starmarks, actions } = this.props;
-    // chrome.history.onVisited.addListener((history) => {
-    //   console.log(history)
-    //   if (!starmarks[history.url]) return;
-    //   const starmark = starmarks[history.url];
-    //   const { visitCount, lastVisitTime } = history;
-    //   actions.addStarmark({
-    //     ...starmark,
-    //     visitCount,
-    //     lastVisitTime
-    //   });
-    // });
+    // addVisitListener(starmarks, actions.addStarmark);
   }
 
   seeStars = () => {

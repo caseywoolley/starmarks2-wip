@@ -2,6 +2,7 @@ import _forEach from 'lodash/forEach';
 const bookmarkBarId = '1';
 const storageBookmarkTitle = 'starmarksData';
 const storageUrl = 'http://www.starmarks.com?data=';
+const initialState = { starmarks: {} };
 
 const buildUrl = state => storageUrl + encodeURIComponent(JSON.stringify(state));
 const buildStorageMark = state => ({
@@ -32,7 +33,7 @@ const treeToHash = (nodes, callback) => {
   return nodeHash;
 };
 
-export const hasExistingState = (callback) => {
+export const getExistingState = (callback) => {
   chrome.bookmarks.search({ title: storageBookmarkTitle }, (existing) => {
     callback(existing);
   });
@@ -47,13 +48,19 @@ export const createNewStorage = (state, callback) => {
 };
 
 export const saveState = (state) => {
-  hasExistingState((existing) => {
+  getExistingState((existing) => {
     existing[0] ? updateExistingStorage(existing[0], state) : createNewStorage(state);
   });
 };
 
+export const getState = (callback) => {
+  getExistingState((existing) => {
+    callback(existing[0] || initialState);
+  });
+};
+
 export const initializeState = (callback) => {
-  hasExistingState((data) => {
+  getExistingState((data) => {
     if (data[0] && data[0].url) {
       const stateJson = data[0].url.split('?data=')[1];
       const existingState = JSON.parse(decodeURIComponent(stateJson));
@@ -66,5 +73,19 @@ export const initializeState = (callback) => {
         });
       });
     }
+  });
+};
+
+export const addVisitListener = (starmarks, addStarmark) => {
+  chrome.history.onVisited.addListener((history) => {
+    if (!starmarks[history.url]) return;
+    console.log(`registered visit: ${history.title}`);
+    const starmark = starmarks[history.url];
+    const { visitCount, lastVisitTime } = history;
+    addStarmark({
+      ...starmark,
+      visitCount,
+      lastVisitTime
+    });
   });
 };

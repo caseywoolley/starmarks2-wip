@@ -30,20 +30,6 @@ class StarItem extends Component {
     };
   }
 
-  componentDidMount() {
-    // const { starmark, actions } = this.props;
-    // chrome.history.search({ text: starmark.url }, (history) => {
-    //   console.log(history)
-    //   const { visitCount, lastVisitTime } = history[0] || {};
-    //   actions.addStarmark({
-    //     ...starmark,
-    //     visitCount,
-    //     lastVisitTime
-    //   });
-    // });
-  }
-
-
   render() {
     const { starmark } = this.props;
     return (
@@ -107,8 +93,6 @@ export default class StarList extends Component {
         {_map(displayMap, (url) => (
           <StarItem key={_uniqueId()} starmark={starmarks[url]} />
         ))}
-
-        {/* {starItems(this.props, this.state)} */}
         <Waypoint onEnter={this.loadMore.bind(this)} />
       </div>
     );

@@ -42,10 +42,7 @@ export default class Starmark extends Component {
     const rating = e.target.value;
     const { url, title } = starmark;
     this.setState({ rating });
-    chrome.history.search({ text: url }, (history) => {
-      const { visitCount = 0, lastVisitTime } = history[0] || {};
-      actions.addStarmark({ url, title, visitCount, lastVisitTime, rating });
-    });
+    actions.addStarmark({ url, title, rating });
   }
 
   render() {

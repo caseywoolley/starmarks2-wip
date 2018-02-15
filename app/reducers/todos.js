@@ -5,9 +5,10 @@ const initialState = {};
 const actionsMap = {
   [ActionTypes.ADD_STARMARK](state, action) {
     const { starmark } = action;
+    const oldStarmark = state[starmark.url] || {};
     return {
       ...state,
-      [starmark.url]: starmark
+      [starmark.url]: { ...oldStarmark, ...starmark }
     };
   },
   // [ActionTypes.EDIT_STARMARK](state, action) {

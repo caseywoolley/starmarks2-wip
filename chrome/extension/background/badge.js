@@ -11,3 +11,7 @@ chrome.storage.local.get('todos', (obj) => {
   //   chrome.browserAction.setBadgeText({ text: '1' });
   // }
 });
+
+const updateBadge = (state) => {
+
+}

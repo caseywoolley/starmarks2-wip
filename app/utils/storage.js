@@ -9,9 +9,10 @@ function udpateHistory(starmarks) {
 }
 
 // todos unmarked count
-function setBadge(todos) {
+function setBadge(starmarks) {
   if (chrome.browserAction) {
     // const count = todos.filter(todo => !todo.marked).length;
+    // const count = starmarks
     // chrome.browserAction.setBadgeText({ text: count > 0 ? count.toString() : '' });
   }
 }
@@ -22,7 +23,7 @@ export default function () {
     store.subscribe(() => {
       const state = store.getState();
       saveState(state);
-      setBadge(state.todos);
+      setBadge(state.starmarks);
     });
     return store;
   };

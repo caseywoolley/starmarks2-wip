@@ -1,4 +1,4 @@
-import _forEach from 'lodash/forEach';
+import _ from 'lodash';
 const bookmarkBarId = '1';
 const storageBookmarkTitle = 'starmarksData';
 const storageUrl = 'http://www.starmarks.com?data=';
@@ -11,12 +11,25 @@ const buildStorageMark = state => ({
   url: buildUrl(state)
 });
 
-const treeHashToStarmarks = (treeHash) => {
-  const starMarks = {};
-  _forEach(treeHash, (val, key) => {
-    starMarks[key] = { title: val.title, url: key };
+const treeHashToStarmarks = (treeHash, callback) => {
+  const starmarks = {};
+  _.forEach(treeHash, (val, url) => {
+    const { title, dateAdded } = val;
+    starmarks[url] = { title, url, dateAdded, lastVisitTime: 0, visitCount: 0 };
   });
-  return starMarks;
+  chrome.history.search({ text: '', startTime: 0, maxResults: 0 }, (history) => {
+    if (history[0]) {
+      const histKeys = _.keyBy(history, 'url')
+      _.forEach(starmarks, (starmark, url) => {
+        if (histKeys[url]) {
+          console.log(histKeys[url])
+          const { visitCount, lastVisitTime } = histKeys[url];
+          starmarks[url] = { ...starmark, visitCount, lastVisitTime };
+        }
+      });
+    }
+    if (callback) { callback(starmarks); }
+  });
 };
 
 const treeToHash = (nodes, callback) => {
@@ -29,7 +42,7 @@ const treeToHash = (nodes, callback) => {
     }
     nodeHash = { ...nodeHash, ...childHash };
   });
-  if (callback) { callback(treeHashToStarmarks(nodeHash)); }
+  if (callback) { treeHashToStarmarks(nodeHash, callback); }
   return nodeHash;
 };
 
@@ -78,7 +91,10 @@ export const initializeState = (callback) => {
 
 export const addVisitListener = (starmarks, addStarmark) => {
   chrome.history.onVisited.addListener((history) => {
-    if (!starmarks[history.url]) return;
+    if (!starmarks[history.url]) {
+      console.log('not a bookmark', history.url, starmarks[history.url]);
+      return;
+    }
     console.log(`registered visit: ${history.title}`);
     const starmark = starmarks[history.url];
     const { visitCount, lastVisitTime } = history;

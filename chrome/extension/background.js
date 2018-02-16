@@ -9,9 +9,16 @@ let store;
 initializeState((state) => {
   store = createStore(state);
   addVisitListener(state.starmarks, (newStarmark) => {
-    store.dispatch(TodoActions.addStarmark(newStarmark));
+    chrome.runtime.sendMessage({ message: 'addStarmark', starmark: newStarmark }, (response) => {
+      if (!response) {
+        store.dispatch(TodoActions.addStarmark(newStarmark));
+      } else if (response.message) {
+        console.log(response.message);
+      }
+    });
   });
 });
+
 
 module.exports = () => store;
 

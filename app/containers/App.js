@@ -32,8 +32,14 @@ export default class App extends Component {
   };
 
   componentDidMount() {
-    // const { starmarks, actions } = this.props;
-    // addVisitListener(starmarks, actions.addStarmark);
+    const { actions } = this.props;
+    chrome.runtime.onMessage.addListener(
+      (request, sender, sendResponse) => {
+        if (request.message === 'addStarmark') {
+          actions.addStarmark(request.starmark);
+          sendResponse({ message: 'saved' });
+        }
+      });
   }
 
   seeStars = () => {

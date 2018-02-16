@@ -1,20 +1,9 @@
 import React, { PropTypes, Component } from 'react';
 import Waypoint from 'react-waypoint';
-import _map from 'lodash/map';
-import _reduce from 'lodash/reduce';
-import _forEach from 'lodash/forEach';
-import _uniqueId from 'lodash/uniqueId';
+import _ from 'lodash';
 import style from './StarList.css';
 import timeSince from '../utils/timeSince';
 import Starmark from '../components/Starmark';
-
-// const toArrayWithKeys = obj => _map(obj, (value, key) => ({ key, ...value }));
-// const getArrayOfKeys = obj => _reduce(obj, (value, key) => key, []);
-// const getHistory = (starmark) => {
-//   return chrome.history.search({ text: starmark.url }, (data) => {
-//     return data[0];
-//   });
-// };
 
 class StarItem extends Component {
 
@@ -36,7 +25,8 @@ class StarItem extends Component {
       <div>
         <span>{starmark.title}</span>
         <span><a href={starmark.url} rel="noopener noreferrer" target="_blank">{starmark.url}</a></span>
-        <span>{timeSince(starmark.lastVisitTime) || 'Never'}</span>
+        <span>{timeSince(starmark.lastVisitTime)}</span>
+        <span>{timeSince(starmark.dateAdded)}</span>
         <span>{starmark.visitCount || 0}</span>
         <span className={style.starmark}>
           <Starmark starmark={starmark} />
@@ -67,31 +57,24 @@ export default class StarList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayLimit: 0,
-      history: {}
+      displayLimit: 30
     };
-  }
-
-  updateHistory = (newHistory) => {
-    this.setState({
-      history: newHistory
-    });
   }
 
   loadMore = () => {
     this.setState({
-      displayLimit: this.state.displayLimit + 5
+      displayLimit: this.state.displayLimit + 30
     });
   }
 
   render() {
     const { starmarks } = this.props;
     const { displayLimit } = this.state;
-    const displayMap = Object.keys(starmarks).slice(0, displayLimit);
+    const displayStarmarks = _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().slice(0, displayLimit);
     return (
       <div className={style.starlist}>
-        {_map(displayMap, (url) => (
-          <StarItem key={_uniqueId()} starmark={starmarks[url]} />
+        {_.map(displayStarmarks, starmark => (
+          <StarItem key={_.uniqueId()} starmark={starmark} />
         ))}
         <Waypoint onEnter={this.loadMore.bind(this)} />
       </div>

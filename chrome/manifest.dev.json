@@ -19,5 +19,5 @@
     "page": "background.html"
   },
   "permissions": [ "bookmarks", "history", "contextMenus", "management", "tabs", "activeTab", "storage", "https://github.com/*", "<all_urls>" ],
-  "content_security_policy": "default-src 'self'; font-src 'self' https://maxcdn.bootstrapcdn.com; script-src 'self' http://localhost:3000 https://localhost:3000 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000; style-src * 'unsafe-inline' 'self' blob:; img-src 'self' data:;"
+  "content_security_policy": "default-src 'self'; img-src * 'self' data: https://google.com/s2/favicon; font-src 'self' https://maxcdn.bootstrapcdn.com; script-src 'self' http://localhost:3000 https://localhost:3000 'unsafe-eval'; connect-src http://localhost:3000 https://localhost:3000; style-src * 'unsafe-inline' 'self' blob:;"
 }

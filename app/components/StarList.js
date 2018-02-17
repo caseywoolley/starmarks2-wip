@@ -23,6 +23,7 @@ class StarItem extends Component {
     const { starmark } = this.props;
     return (
       <div>
+        <img alt="" src={`https://www.google.com/s2/favicons?domain=${starmark.url}`} />
         <span>{starmark.title}</span>
         <span><a href={starmark.url} rel="noopener noreferrer" target="_blank">{starmark.url}</a></span>
         <span>{timeSince(starmark.lastVisitTime)}</span>

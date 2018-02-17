@@ -16,6 +16,9 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.stars {
   font-size: 45px;
 }
 

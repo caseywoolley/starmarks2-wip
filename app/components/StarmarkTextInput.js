@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-// import style from './TodoTextInput.css';
+import style from './StarmarkTextInput.css';
 
 export default class StarmarkTextInput extends Component {
 
@@ -45,6 +45,7 @@ export default class StarmarkTextInput extends Component {
   render() {
     return (
       <input
+        className={style.edit}
         // className={classnames({
         //   [style.edit]: this.props.editing,
         //   [style.new]: this.props.newTodo

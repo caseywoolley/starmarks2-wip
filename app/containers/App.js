@@ -2,13 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as TodoActions from '../actions/todos';
-import { addVisitListener } from '../../app/utils/bookmarkStorage';
 
-// import Header from '../components/Header';
-// import MainSection from '../components/MainSection';
-import Starmark from '../components/Starmark';
-import StarList from '../components/StarList';
 import StarmarkTextInput from '../components/StarmarkTextInput';
+import StarSelector from '../components/StarSelector';
+import StarList from '../components/StarList';
 import style from './App.css';
 
 const isPopup = window.location.pathname === '/popup.html';
@@ -40,11 +37,11 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    const { actions } = this.props;
+    const { addStarmark } = this.props.actions;
     chrome.runtime.onMessage.addListener(
       (request, sender, sendResponse) => {
         if (request.message === 'addStarmark') {
-          actions.addStarmark(request.starmark);
+          addStarmark(request.starmark);
           sendResponse({ message: 'saved' });
         }
       });
@@ -70,18 +67,20 @@ export default class App extends Component {
     return (
       <div className={style.container}>
         { !isPopup && <StarList starmarks={starmarks} actions={actions} /> }
-        <div className={style.popup}>
-          <div className={style.stars}><Starmark
-            starmark={{ title: starmark.title, rating: starmark.rating, url: activeTab.url }}
-            addStarmark={actions.addStarmark}
-          /></div>
-          { !isEditing
-              ? <div onDoubleClick={() => this.setState({ isEditing: true })}>{starmark.title}</div>
-              : <StarmarkTextInput text={starmark.title} onSave={this.onSave} />
-          }
-          <div>{activeTab.url}</div>
-          { isPopup && <button onClick={this.seeStars}>Explore Starmarks</button>}
-        </div>
+        { isPopup &&
+          <div className={style.popup}>
+            <div className={style.stars}><StarSelector
+              starmark={{ title: starmark.title, rating: starmark.rating, url: activeTab.url }}
+              addStarmark={actions.addStarmark}
+            /></div>
+            { !isEditing
+                ? <div onDoubleClick={() => this.setState({ isEditing: true })}>{starmark.title}</div>
+                : <StarmarkTextInput text={starmark.title} onSave={this.onSave} />
+            }
+            <div>{activeTab.url}</div>
+            <button onClick={this.seeStars}>Explore Starmarks</button>
+          </div>
+        }
       </div>
     );
   }

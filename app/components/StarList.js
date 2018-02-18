@@ -1,52 +1,10 @@
 import React, { PropTypes, Component } from 'react';
 import Waypoint from 'react-waypoint';
+import classnames from 'classnames';
 import _ from 'lodash';
+
+import Starmark from './Starmark';
 import style from './StarList.css';
-import timeSince from '../utils/timeSince';
-import Starmark from '../components/Starmark';
-
-class StarItem extends Component {
-
-  static propTypes = {
-    starmark: PropTypes.object.isRequired,
-    // actions: PropTypes.object.isRequired
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      history: {}
-    };
-  }
-
-  render() {
-    const { starmark } = this.props;
-    return (
-      <div>
-        <img alt="" src={`https://www.google.com/s2/favicons?domain=${starmark.url}`} />
-        <span>{starmark.title}</span>
-        <span><a href={starmark.url} rel="noopener noreferrer" target="_blank">{starmark.url}</a></span>
-        <span>{timeSince(starmark.lastVisitTime)}</span>
-        <span>{timeSince(starmark.dateAdded)}</span>
-        <span>{starmark.visitCount || 0}</span>
-        <span className={style.starmark}>
-          <Starmark starmark={starmark} />
-        </span>
-      </div>
-    );
-  }
-
-}
-
-// const starItems = ({ starmarks, actions }, { displayLimit, history }) => {
-//   // const visibleStarmarks = toArrayWithKeys(starmarks).slice(0, displayLimit);
-//   const displayMap = Object.keys(starmarks).slice(0, displayLimit);
-//   return _map(displayMap, (url) => {
-//     return (
-//       <StarItem key={_uniqueId()} starmark={starmarks[url]} actions={actions} />
-//     );
-//   });
-// };
 
 export default class StarList extends Component {
 
@@ -74,8 +32,10 @@ export default class StarList extends Component {
     const displayStarmarks = _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().slice(0, displayLimit);
     return (
       <div className={style.starlist}>
-        {_.map(displayStarmarks, starmark => (
-          <StarItem key={_.uniqueId()} starmark={starmark} />
+        {_.map(displayStarmarks, (starmark, i) => (
+          <div className={classnames({ [style.oddRow]: i % 2 })}>
+          <Starmark  key={starmark.url} starmark={starmark} />
+          </div>
         ))}
         <Waypoint onEnter={this.loadMore.bind(this)} />
       </div>

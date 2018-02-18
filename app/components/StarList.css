@@ -1,14 +1,15 @@
 .starlist {
-  width: 60%;
+  padding-top: 90px;
+  width: 80%;
 }
 
 .starlist span {
   padding: 10px;
-  word-break: break-all;
   display: inline-block;
   vertical-align: middle;
+  border-top: 1px solid #dadada
 }
 
-.starmark {
-  font-size: 24px;
+.oddRow {
+  background: #f9f9f9;
 }

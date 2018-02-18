@@ -1,43 +1,67 @@
-@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css?family=FontAwesome);
-
-/****** Style Star Rating Widget *****/
-body{
-  background-color: rgb(243, 243, 243);
-}
-
-.container {
+.starmark {
+  font-size: 14px;
+  font-weight: 400;
+  white-space: nowrap;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  /* flex: 1; */
 }
 
-.rating {
-  border: none;
-  margin: 0px;
-  padding: 0px;
+.starmark span {
+  /* align-self: flex-start; */
+  flex: 1;
 }
 
-.rating > input { display: none; }
-.rating > label:before {
-  margin: .05em;
-  /* font-size: 45px; */
-  font-family: FontAwesome;
-  display: inline-block;
-  content: "\f005";
+.stars {
+  font-size: 20px;
+  min-width: 6em;
+  max-width: 6em;
 }
 
-.rating > label {
-  color: #ddd;
-  float: right;
+.favicon {
+  max-width: 20px;
+  min-width: 20px;
 }
 
-/***** CSS Magic to Highlight Stars on Hover *****/
+.date {
+  max-width: 6em;
+  min-width: 6em;
+}
 
-.rating > input:checked ~ label, /* show gold star when clicked */
-.rating:not(:checked) > label:hover, /* hover current star */
-.rating:not(:checked) > label:hover ~ label { color: #FFD700;  } /* hover previous stars in list */
+.visitCount {
+  max-width: 3em;
+  min-width: 3em;
+}
 
-.rating > input:checked + label:hover, /* hover current star when changing rating */
-.rating > input:checked ~ label:hover,
-.rating > label:hover ~ input:checked ~ label, /* lighten current selection */
-.rating > input:checked ~ label:hover ~ label { color: #FFED85;  }
+.title {
+  font-size: 24px;
+  font-weight: 200;
+}
+
+.title,
+.url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title a {
+  color: black;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title a:hover {
+  color: orange;
+}
+
+.url a {
+  text-decoration: none;
+  color: rgb(180, 180, 180);
+  max-width: 100px;
+}
+
+img {
+  max-width: 100%;
+}

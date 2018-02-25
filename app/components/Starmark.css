@@ -1,16 +1,21 @@
 .starmark {
   font-size: 14px;
   font-weight: 400;
+
+}
+
+.row {
   white-space: nowrap;
   display: flex;
   justify-content: space-between;
   flex-wrap: nowrap;
-  /* flex: 1; */
 }
 
-.starmark span {
-  /* align-self: flex-start; */
+.row > span {
   flex: 1;
+  padding: 10px;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .stars {
@@ -20,8 +25,13 @@
 }
 
 .favicon {
-  max-width: 20px;
-  min-width: 20px;
+  max-width: 16px;
+  min-width: 16px;
+}
+
+.favicon img {
+  max-width: 100%;
+  vertical-align: middle;
 }
 
 .date {
@@ -37,6 +47,7 @@
 .title {
   font-size: 24px;
   font-weight: 200;
+  width: 100px;
 }
 
 .title,
@@ -51,17 +62,31 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
+.tag:hover,
 .title a:hover {
   color: orange;
 }
 
+span.url {
+  padding-left: 10px;
+  border-top: 0px;
+}
+
 .url a {
+  font-size: 14px;
   text-decoration: none;
   color: rgb(180, 180, 180);
   max-width: 100px;
 }
 
-img {
-  max-width: 100%;
+.tagRow {
+  font-size: 12px;
+  line-height: 2em;
+}
+
+.tag {
+  font-weight:  400;
+  cursor: pointer;
+  color: rgb(77, 154, 212);
+  padding-right: 10px;
 }

@@ -9,7 +9,7 @@ const NewTabLink = (props) => (
   <a href={props.url} rel="noopener noreferrer" target="_blank">{props.children}</a>
 );
 
-export default class StarItem extends Component {
+export default class Starmark extends Component {
 
   static propTypes = {
     starmark: PropTypes.object.isRequired,
@@ -24,22 +24,29 @@ export default class StarItem extends Component {
   }
 
   render() {
-    const { starmark } = this.props;
+    const { starmark, updateSearch } = this.props;
     return (
       <div className={style.starmark}>
-        <span className={style.favicon}><img alt="" src={getFavicon(starmark.url)} /></span>
-        <span className={style.title}>
-          <NewTabLink url={starmark.url}>{starmark.title}</NewTabLink>
-        </span>
-        <span className={style.url}>
-          <NewTabLink url={starmark.url}>{starmark.url}</NewTabLink>
-        </span>
-        <span className={style.stars}>
-          <StarSelector starmark={starmark} />
-        </span>
-        <span className={style.date}>{timeSince(starmark.dateAdded)}</span>
-        <span className={style.date}>{timeSince(starmark.lastVisitTime)}</span>
-        <span className={style.visitCount}>{starmark.visitCount || 0}</span>
+        <div className={style.row}>
+          <span className={style.favicon}><img alt="" src={getFavicon(starmark.url)} /></span>
+          <span className={style.title}>
+            <div>
+              <NewTabLink url={starmark.url}><span title={starmark.title}>{starmark.title}</span></NewTabLink>
+              <span className={style.url}>
+                <NewTabLink url={starmark.url}>{starmark.url}</NewTabLink>
+              </span>
+            </div>
+            <div className={style.tagRow}>
+              { starmark.tags.map(tag => <span onClick={() => updateSearch(tag)} className={style.tag} key={tag.id}>{tag.title}</span>) }
+            </div>
+          </span>
+          <span className={style.stars}>
+            <StarSelector starmark={starmark} />
+          </span>
+          <span className={style.date}>{timeSince(starmark.dateAdded)}</span>
+          <span className={style.date}>{timeSince(starmark.lastVisitTime)}</span>
+          <span className={style.visitCount}>{starmark.visitCount || 0}</span>
+        </div>
       </div>
     );
   }

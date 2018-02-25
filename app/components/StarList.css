@@ -3,10 +3,7 @@
   width: 80%;
 }
 
-.starlist span {
-  padding: 10px;
-  display: inline-block;
-  vertical-align: middle;
+.starlist > div {
   border-top: 1px solid #dadada
 }
 

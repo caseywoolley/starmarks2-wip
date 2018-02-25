@@ -6,6 +6,10 @@ import _ from 'lodash';
 import Starmark from './Starmark';
 import style from './StarList.css';
 
+const searchFilter = (search, starmark) => {
+  return _.find(starmark.tags, { title: search });
+};
+
 export default class StarList extends Component {
 
   static propTypes = {
@@ -16,7 +20,8 @@ export default class StarList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayLimit: 30
+      displayLimit: 30,
+      search: ''
     };
   }
 
@@ -26,18 +31,28 @@ export default class StarList extends Component {
     });
   }
 
+  updateSearch = (update) => {
+    console.log(update)
+    this.setState({
+      search: update.title,
+      displayLimit: 30
+    });
+  }
+
   render() {
     const { starmarks } = this.props;
-    const { displayLimit } = this.state;
-    const displayStarmarks = _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().slice(0, displayLimit);
+    const { displayLimit, search } = this.state;
+    const displayStarmarks = _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().filter((starmark) => {
+      return _.find(starmark.tags, tag => tag.title.includes(search));
+    }).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         {_.map(displayStarmarks, (starmark, i) => (
-          <div className={classnames({ [style.oddRow]: i % 2 })}>
-          <Starmark  key={starmark.url} starmark={starmark} />
+          <div key={starmark.url} className={classnames({ [style.oddRow]: i % 2 })}>
+            <Starmark starmark={starmark} updateSearch={this.updateSearch} />
           </div>
         ))}
-        <Waypoint onEnter={this.loadMore.bind(this)} />
+        <Waypoint key={displayLimit} onEnter={this.loadMore} />
       </div>
     );
   }

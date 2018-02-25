@@ -1,4 +1,5 @@
-import _ from 'lodash';
+import bookmarksToStarmarks from './bookmarksToStarmarks';
+
 const bookmarkBarId = '1';
 const storageBookmarkTitle = 'starmarksData';
 const storageUrl = 'http://www.starmarks.com?data=';
@@ -10,41 +11,6 @@ const buildStorageMark = state => ({
   title: storageBookmarkTitle,
   url: buildUrl(state)
 });
-
-const treeHashToStarmarks = (treeHash, callback) => {
-  const starmarks = {};
-  _.forEach(treeHash, (val, url) => {
-    const { title, dateAdded } = val;
-    starmarks[url] = { title, url, dateAdded, lastVisitTime: 0, visitCount: 0 };
-  });
-  chrome.history.search({ text: '', startTime: 0, maxResults: 0 }, (history) => {
-    if (history[0]) {
-      const histKeys = _.keyBy(history, 'url')
-      _.forEach(starmarks, (starmark, url) => {
-        if (histKeys[url]) {
-          console.log(histKeys[url])
-          const { visitCount, lastVisitTime } = histKeys[url];
-          starmarks[url] = { ...starmark, visitCount, lastVisitTime };
-        }
-      });
-    }
-    if (callback) { callback(starmarks); }
-  });
-};
-
-const treeToHash = (nodes, callback) => {
-  let nodeHash = {};
-  let childHash;
-  nodes.forEach((node) => {
-    childHash = node.children ? treeToHash(node.children) : {};
-    if (node.url) {
-      nodeHash[node.url || node.title || 'top'] = node;
-    }
-    nodeHash = { ...nodeHash, ...childHash };
-  });
-  if (callback) { treeHashToStarmarks(nodeHash, callback); }
-  return nodeHash;
-};
 
 export const getExistingState = (callback) => {
   chrome.bookmarks.search({ title: storageBookmarkTitle }, (existing) => {
@@ -72,6 +38,16 @@ export const getState = (callback) => {
   });
 };
 
+export const getBookmarkState = (callback) => {
+  chrome.bookmarks.getTree((nodes) => {
+    bookmarksToStarmarks(nodes)
+      .then((hash) => {
+        const newState = { starmarks: hash };
+        callback(newState);
+      });
+  });
+};
+
 export const initializeState = (callback) => {
   getExistingState((data) => {
     if (data[0] && data[0].url) {
@@ -80,10 +56,11 @@ export const initializeState = (callback) => {
       callback(existingState);
     } else {
       chrome.bookmarks.getTree((nodes) => {
-        treeToHash(nodes, (hash) => {
-          const newState = { starmarks: hash };
-          createNewStorage(newState, () => { callback(newState); });
-        });
+        bookmarksToStarmarks(nodes)
+          .then((hash) => {
+            const newState = { starmarks: hash };
+            createNewStorage(newState, () => { callback(newState); });
+          });
       });
     }
   });

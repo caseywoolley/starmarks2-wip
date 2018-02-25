@@ -3,11 +3,6 @@
 // }
 import { saveState } from './bookmarkStorage';
 
-
-function udpateHistory(starmarks) {
-  // update history for all ? expensive?
-}
-
 // todos unmarked count
 function setBadge(starmarks) {
   if (chrome.browserAction) {

@@ -22,6 +22,7 @@ promisifyAll(chrome, [
   'bookmarks',
   'history',
   'tabs',
+  'runtime',
   'windows',
   'browserAction',
   'contextMenus'

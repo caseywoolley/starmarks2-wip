@@ -1,10 +1,10 @@
 .starlist {
-  padding-top: 90px;
-  width: 80%;
+  padding-top: 20px;
+  width: 50%;
 }
 
 .starlist > div {
-  border-top: 1px solid #dadada
+  border-top: 1px solid rgb(235, 235, 235);
 }
 
 .oddRow {

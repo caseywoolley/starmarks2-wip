@@ -33,7 +33,7 @@ export default class Starmark extends Component {
             <div>
               <NewTabLink url={starmark.url}><span title={starmark.title}>{starmark.title}</span></NewTabLink>
               <span className={style.url}>
-                <NewTabLink url={starmark.url}>{starmark.url}</NewTabLink>
+                <NewTabLink url={starmark.url}><span title={starmark.url}>{starmark.url}</span></NewTabLink>
               </span>
             </div>
             <div className={style.tagRow}>

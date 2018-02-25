@@ -5,6 +5,7 @@ import * as TodoActions from '../actions/todos';
 
 import StarmarkTextInput from '../components/StarmarkTextInput';
 import StarSelector from '../components/StarSelector';
+import SearchBar from '../components/SearchBar';
 import StarList from '../components/StarList';
 import style from './App.css';
 
@@ -65,8 +66,13 @@ export default class App extends Component {
     const { isEditing } = this.state;
     const starmark = starmarks[activeTab.url] || activeTab;
     return (
-      <div className={style.container}>
-        { !isPopup && <StarList starmarks={starmarks} actions={actions} /> }
+      <div >
+        { !isPopup &&
+          <div className={style.container}>
+            <SearchBar />
+            <StarList starmarks={starmarks} actions={actions} />
+          </div>
+        }
         { isPopup &&
           <div className={style.popup}>
             <div className={style.stars}><StarSelector

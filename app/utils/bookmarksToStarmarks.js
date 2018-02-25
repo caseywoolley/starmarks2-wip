@@ -8,7 +8,7 @@ const mapHistory = (starmarks, resolve) => {
   const updatedStarmarks = { ...starmarks };
   chrome.history.search({ text: '', startTime: 0, maxResults: 0 }, (history) => {
     if (history[0]) {
-      const histKeys = _.keyBy(history, 'url')
+      const histKeys = _.keyBy(history, 'url');
       _.forEach(updatedStarmarks, (starmark, url) => {
         if (histKeys[url]) {
           const { visitCount, lastVisitTime } = histKeys[url];

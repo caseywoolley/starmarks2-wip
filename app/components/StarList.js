@@ -10,6 +10,12 @@ const searchFilter = (search, starmark) => {
   return _.find(starmark.tags, { title: search });
 };
 
+const displayStarmarks = (starmarks, search) => {
+  return _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().filter((starmark) => {
+    return _.find(starmark.tags, tag => tag.title.includes(search));
+  });
+}
+
 export default class StarList extends Component {
 
   static propTypes = {
@@ -28,9 +34,12 @@ export default class StarList extends Component {
   }
 
   loadMore = () => {
-    this.setState({
-      displayLimit: this.state.displayLimit + 30
-    });
+    console.log(displayStarmarks(this.props.starmarks, this.state.search).length)
+    if (this.state.displayLimit < displayStarmarks(this.props.starmarks, this.state.search).length) {
+      this.setState({
+        displayLimit: this.state.displayLimit + 30
+      });
+    }
   }
 
   updateSearch = (update) => {
@@ -44,12 +53,10 @@ export default class StarList extends Component {
   render() {
     const { starmarks } = this.props;
     const { displayLimit, search } = this.state;
-    const displayStarmarks = _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().filter((starmark) => {
-      return _.find(starmark.tags, tag => tag.title.includes(search));
-    }).slice(0, displayLimit);
+    const starmarksArray = displayStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
-        {_.map(displayStarmarks, (starmark, i) => (
+        {_.map(starmarksArray, (starmark, i) => (
           <div key={starmark.url} className={classnames({ [style.oddRow]: i % 2 })}>
             <Starmark starmark={starmark} updateSearch={this.updateSearch} />
           </div>

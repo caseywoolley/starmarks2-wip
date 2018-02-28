@@ -29,8 +29,6 @@ export default class StarList extends Component {
       displayLimit: 30,
       search: ''
     };
-
-    console.log('url', chrome.runtime.getURL(''));
   }
 
   loadMore = () => {

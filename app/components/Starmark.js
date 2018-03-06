@@ -37,7 +37,7 @@ export default class Starmark extends Component {
               </span>
             </div>
             <div className={style.tagRow}>
-              { starmark.tags.map(tag => <span onClick={() => updateSearch(tag)} className={style.tag} key={tag.id}>{tag.title}</span>) }
+              { starmark.tags.map(tag => <span onClick={() => updateSearch(tag)} className={style.tag} key={tag}>{tag}</span>) }
             </div>
           </span>
           <span className={style.stars}>

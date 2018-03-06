@@ -12,7 +12,7 @@ const searchFilter = (search, starmark) => {
 
 const displayStarmarks = (starmarks, search) => {
   return _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().filter((starmark) => {
-    return _.find(starmark.tags, tag => tag.title.includes(search));
+    return true //_.find(starmark.tags, tag => tag.title.includes(search));
   });
 }
 

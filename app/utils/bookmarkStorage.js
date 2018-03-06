@@ -14,6 +14,9 @@ const buildStorageMark = state => ({
 
 
 export const getExistingState = (callback) => {
+  // chrome.runtime.sendMessage({ message: 'getState'}, (existing) => {
+  //   callback(existing)
+  // });
   chrome.bookmarks.search({ title: storageBookmarkTitle }, (existing) => {
     callback(existing);
   });

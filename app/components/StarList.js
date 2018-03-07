@@ -11,9 +11,9 @@ const searchFilter = (search, starmark) => {
 };
 
 const displayStarmarks = (starmarks, search) => {
-  return _.sortBy(_.toArray(starmarks), 'dateAdded').reverse().filter((starmark) => {
-    return true //_.find(starmark.tags, tag => tag.title.includes(search));
-  });
+  return _.sortBy(_.toArray(starmarks), 'dateAdded').reverse(); //.filter((starmark) => {
+  //   return true //_.find(starmark.tags, tag => tag.title.includes(search));
+  // });
 }
 
 export default class StarList extends Component {
@@ -49,14 +49,14 @@ export default class StarList extends Component {
   }
 
   render() {
-    const { starmarks } = this.props;
+    const { starmarks, tags } = this.props;
     const { displayLimit, search } = this.state;
-    const starmarksArray = displayStarmarks(starmarks, search).slice(0, displayLimit);
+    const starmarksArray = displayStarmarks(starmarks, search).slice(2, displayLimit);
     return (
       <div className={style.starlist}>
         {_.map(starmarksArray, (starmark, i) => (
           <div key={starmark.url} className={classnames({ [style.oddRow]: i % 2 })}>
-            <Starmark starmark={starmark} updateSearch={this.updateSearch} />
+            <Starmark starmark={starmark} tags={tags} updateSearch={this.updateSearch} />
           </div>
         ))}
         <Waypoint key={displayLimit} onEnter={this.loadMore} />

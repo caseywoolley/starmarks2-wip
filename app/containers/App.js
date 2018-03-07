@@ -17,7 +17,8 @@ chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
 
 @connect(
   state => ({
-    starmarks: state.starmarks
+    starmarks: state.starmarks,
+    tags: state.tags
   }),
   dispatch => ({
     actions: bindActionCreators(TodoActions, dispatch)
@@ -62,7 +63,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { starmarks, actions } = this.props;
+    const { starmarks, tags, actions } = this.props;
     const { isEditing } = this.state;
     const starmark = starmarks[activeTab.url] || activeTab;
     return (
@@ -70,7 +71,7 @@ export default class App extends Component {
         { !isPopup &&
           <div className={style.container}>
             <SearchBar />
-            <StarList starmarks={starmarks} actions={actions} />
+            <StarList starmarks={starmarks} tags={tags} actions={actions} />
           </div>
         }
         { isPopup &&

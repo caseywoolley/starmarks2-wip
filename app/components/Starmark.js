@@ -9,6 +9,7 @@ const NewTabLink = (props) => (
   <a href={props.url} rel="noopener noreferrer" target="_blank">{props.children}</a>
 );
 
+
 export default class Starmark extends Component {
 
   static propTypes = {
@@ -24,7 +25,7 @@ export default class Starmark extends Component {
   }
 
   render() {
-    const { starmark, updateSearch } = this.props;
+    const { starmark, tags, updateSearch } = this.props;
     return (
       <div className={style.starmark}>
         <div className={style.row}>
@@ -37,7 +38,7 @@ export default class Starmark extends Component {
               </span>
             </div>
             <div className={style.tagRow}>
-              { starmark.tags.map(tag => <span onClick={() => updateSearch(tag)} className={style.tag} key={tag}>{tag}</span>) }
+              { starmark.tags.map(tagId => <span onClick={() => updateSearch(tagId)} className={style.tag} key={tagId}>{tags[tagId].title}</span>) }
             </div>
           </span>
           <span className={style.stars}>

@@ -112,7 +112,7 @@ const treeToHash = (nodes, callback) => {
   const hash = treeRecurse(nodes);
   const state = hashToState(hash);
   debugger
-  callback(state.starmarks);
+  callback(state);
 };
 
 const nodesToStarmarks = (starmarks, { url, dateAdded, id, parentId, title }) => {

@@ -51,7 +51,7 @@ export default class StarList extends Component {
   render() {
     const { starmarks, tags } = this.props;
     const { displayLimit, search } = this.state;
-    const starmarksArray = displayStarmarks(starmarks, search).slice(2, displayLimit);
+    const starmarksArray = displayStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         {_.map(starmarksArray, (starmark, i) => (

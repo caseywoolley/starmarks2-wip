@@ -14,7 +14,7 @@
 
 .row > span {
   flex: 1;
-  padding: 7px 5px;
+  padding: 10px 5px;
   display: inline-block;
   vertical-align: middle;
 }

@@ -6,10 +6,10 @@ const promisify = fn => (...args) => new Promise((resolve) => { fn(...args, reso
 // chrome.history.search = promisify(chrome.history.search);
 
 const baseUrl = chrome.runtime.getURL('');
-const storageFolderTitle = `Starmarks Data (Don't Remove) - ${baseUrl}`;
+const storageFolderTitle = 'Starmarks Data';
 
 const buildStarmarkTitle = starmark => `Starmarks Data ${starmark.bookmarkIds[0]} - ${baseUrl}`;
-const buildStarmarkUrl = state => `${baseUrl}?starmark=${encodeURIComponent(JSON.stringify(state))}`;
+const buildStarmarkUrl = state => `http://www.starmarks.com?starmark=${encodeURIComponent(JSON.stringify(state))}`;
 const buildStorageFolder = () => ({
   parentId: '1',
   title: storageFolderTitle
@@ -53,8 +53,8 @@ export const updateStarmark = (starmark) => {
 // };
 
 // change to reduce rather than foreach
-const middleStep = (starmarks, parentId, callback) => {
-  const updatedStarmarks = { ...starmarks };
+const middleStep = (state, parentId, callback) => {
+  const updatedStarmarks = { ...state.starmarks };
   const total = Object.keys(updatedStarmarks).length;
   let count = 0;
   _.forEach(updatedStarmarks, (starmark, url) => {
@@ -63,26 +63,26 @@ const middleStep = (starmarks, parentId, callback) => {
       updatedStarmarks[url].id = newBookmark.id;
       count += 1;
       if (count === total) {
-        callback(updatedStarmarks);
+        callback({ ...state, starmarks: updatedStarmarks });
       }
     });
   });
 };
 
-const saveStarmarkBookmarks = (starmarks, resolve) => {
+const saveStarmarkBookmarks = (state, resolve) => {
   chrome.bookmarks.search({ title: storageFolderTitle }, (folder) => {
     if (!folder[0]) {
       chrome.bookmarks.create(buildStorageFolder(), (newFolder) => {
-        middleStep(starmarks, newFolder.id, resolve);
+        middleStep(state, newFolder.id, resolve);
       });
     } else {
-      middleStep(starmarks, folder[0].id, resolve);
+      middleStep(state, folder[0].id, resolve);
     }
   });
 };
 
-const mapHistory = (starmarks, resolve) => {
-  const updatedStarmarks = { ...starmarks };
+const mapHistory = (state, resolve) => {
+  const updatedStarmarks = { ...state.starmarks };
   chrome.history.search({ text: '', startTime: 0, maxResults: 0 }, (history) => {
     if (history[0]) {
       const histKeys = _.keyBy(history, 'url');
@@ -93,7 +93,7 @@ const mapHistory = (starmarks, resolve) => {
         }
       });
     }
-    resolve(updatedStarmarks);
+    resolve({ ...state, starmarks: updatedStarmarks });
   });
 };
 
@@ -275,7 +275,7 @@ const loadStarmarks = () => folderToUrlHash(storageFolderTitle)
 
 const bookmarksToStarmarks = nodes => bookmarksToUrlHash(nodes)
                                         .then(mapBookmarkHistory)
-                                        .then(starmarksToBookmarks)
+                                        // .then(starmarksToBookmarks)
                                         .tap(console.log.bind(console));
 
 export default bookmarksToStarmarks;

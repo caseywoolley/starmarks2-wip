@@ -15,7 +15,7 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
 
 const enhancer = composeEnhancers(
   applyMiddleware(thunk, storeOnAction),
-  storage(),
+  // storage(),
 );
 
 export default function (initialState) {

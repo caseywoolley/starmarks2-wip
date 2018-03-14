@@ -9,7 +9,8 @@ const baseUrl = chrome.runtime.getURL('');
 const storageFolderTitle = 'Starmarks Data';
 
 const buildStarmarkTitle = starmark => `Starmarks Data ${starmark.bookmarkIds[0]} - ${baseUrl}`;
-const buildStarmarkUrl = state => `http://www.starmarks.com?starmark=${encodeURIComponent(JSON.stringify(state))}`;
+const urlBase = 'http://www.starmarks.com/?starmark=';
+const buildStarmarkUrl = state => `${urlBase}${encodeURIComponent(JSON.stringify(state))}`;
 const buildStorageFolder = () => ({
   parentId: '1',
   title: storageFolderTitle
@@ -21,21 +22,29 @@ const buildStorageFolder = () => ({
 // });
 
 
-const createStarmark = (starmark, parentId, url, callback) => {
-  chrome.bookmarks.search({ title: url }, (bookmarks) => {
-    if (!bookmarks[0]) {
-      chrome.bookmarks.create({ parentId, title: url, url: buildStarmarkUrl(starmark) }, callback);
-    } else {
-      callback(bookmarks[0]);
-    }
-  });
-};
+// const createStarmark = (starmark, parentId, url, callback) => {
+//   chrome.bookmarks.search({ title: url }, (bookmarks) => {
+//     if (!bookmarks[0]) {
+//       chrome.bookmarks.create({ parentId, title: url, url: buildStarmarkUrl(starmark) }, callback);
+//     } else {
+//       callback(bookmarks[0]);
+//     }
+//   });
+// };
 
 export const updateStarmark = (starmark) => {
   chrome.bookmarks.search({ title: storageFolderTitle }, (folder) => {
     if (folder[0]) {
-      chrome.bookmarks.update(starmark.id, { url: buildStarmarkUrl(starmark) }, (bookmark) => {
-        console.log('saved bookmark', bookmark);
+      chrome.bookmarks.search({ title: starmark.url }, (foundBookmarks) => {
+        if (foundBookmarks[0]) {
+          chrome.bookmarks.update(foundBookmarks[0].id, { url: buildStarmarkUrl(starmark) }, (bookmark) => {
+            console.log('saved bookmark', bookmark);
+          });
+        } else {
+          chrome.bookmarks.create({ parentId: foundBookmarks[0], title: starmark.url, url: buildStarmarkUrl(starmark) }, (newBookmark) => {
+            console.log('created bookmark', newBookmark);
+          });
+        }
       });
     }
   });
@@ -81,6 +90,15 @@ const saveStarmarkBookmarks = (state, resolve) => {
   });
 };
 
+export const getHistory = () => chrome.history.searchAsync({ text: '', startTime: 0, maxResults: 0 });
+export const getNodeHistory = (url, history) => {
+  if (history[url]) {
+    const { visitCount, lastVisitTime } = history[url];
+    return { visitCount, lastVisitTime };
+  }
+  return {};
+};
+
 const mapHistory = (state, resolve) => {
   const updatedStarmarks = { ...state.starmarks };
   chrome.history.search({ text: '', startTime: 0, maxResults: 0 }, (history) => {
@@ -97,21 +115,45 @@ const mapHistory = (state, resolve) => {
   });
 };
 
-const treeRecurse = (nodes, parentNodes) => {
-  let urlHash = {};
-  const parents = parentNodes || [];
+
+const isStoredStarmark = node => _.get(_.last(node.parents), 'title') === storageFolderTitle;
+const isStateBookmark = node => node.title === 'starmarksData';
+
+// const stateBuilder = (store) => {
+//   get state base
+//     compare date?- overwrite?
+//   return (node) => {
+//     if (node.url) {
+//       store.dispatch(TodoActions.addStarmark(starmark));
+//     } else if (node.title) {
+//       store.dispatch(TodoActions.addTag(node));
+//     }
+//     is starmark
+//       compare - add
+//     is tag?
+//       compare - add
+//   };
+// };
+
+export const treeRecurse = (nodes, process, parents = []) => {
+  // let urlHash = {};
   nodes.forEach((node) => {
-    urlHash[node.id] = { ...node, parents };
-    const childHash = node.children ? treeRecurse(node.children, parents.concat(node)) : {};
-    urlHash = { ...urlHash, ...childHash };
+    process({ ...node, parents });
+    // urlHash[node.id] = { ...node, parents };
+    // process(urlHash[node.id]);
+    // const childHash = node.children && !isStoredStarmark(node) ?
+    if (node.children) {
+      treeRecurse(node.children, process, parents.concat(node));
+    }
+    // urlHash = { ...urlHash, ...childHash };
   });
-  return urlHash;
+  // return urlHash;
 };
 
-const treeToHash = (nodes, callback) => {
-  const hash = treeRecurse(nodes);
-  const state = hashToState(hash);
+export const treeToHash = (tree, callback) => {
+  const hash = treeRecurse(tree, [], callback);
   debugger
+  const state = hashToState(hash);
   callback(state);
 };
 
@@ -125,11 +167,8 @@ const nodesToStarmarks = (starmarks, { url, dateAdded, id, parentId, title }) =>
   return result;
 };
 
-const isStoredStarmark = (node) => {
-  return _.get(_.last(node.parents), 'title') === storageFolderTitle;
-};
-
-const isStateBookmark = node => node.title === 'starmarksData';
+export const nodeToTag = ({ title, id, parentId }) => ({ title, id, parentId });
+export const nodeToStarmark = ({ url, dateAdded, id, parentId, title, parents }) => ({ url, dateAdded, id, bookmarkIds: [id], parentId, title, tags: _.map(parents, 'id'), rating: 1 });
 
 const jsonToState = (starmarks, node) => {
   const stateJson = node.url.split('?starmark=')[1];

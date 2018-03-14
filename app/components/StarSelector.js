@@ -40,7 +40,7 @@ export default class StarSelector extends Component {
   handleChange = (e) => {
     const { actions, starmark } = this.props;
     const { url, title } = starmark;
-    const rating = e.target.value;
+    const rating = parseInt(e.target.value, 10);
     this.setState({ rating });
     chrome.runtime.sendMessage({ message: 'addStarmark', starmark: { url, title, rating } }, (response) => {
       if (!response) {
@@ -54,7 +54,7 @@ export default class StarSelector extends Component {
 
   render() {
     const id = _uniqueId();
-    const ratingInput = i => <input type="radio" checked={this.state.rating === i.toString()} onChange={this.handleChange} id={`star${i}-${id}`} value={i} />;
+    const ratingInput = i => <input type="radio" checked={this.state.rating === i} onChange={this.handleChange} id={`star${i}-${id}`} value={i} />;
     const ratingLabel = i => <label htmlFor={`star${i}-${id}`} title={`${i} stars`} />;
     return (
       <div className={style.container}>

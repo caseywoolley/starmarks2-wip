@@ -4,6 +4,10 @@ export function addStarmark(starmark) {
   return { type: types.ADD_STARMARK, starmark };
 }
 
+export function addTag(tag) {
+  return { type: types.ADD_TAG, tag };
+}
+
 export function addTodo(text) {
   return { type: types.ADD_TODO, text };
 }

@@ -12,7 +12,9 @@ const actionsMap = {
       [tag.id]: { ...oldTag, ...tag }
     };
   },
-
+  [ActionTypes.ADD_TAGS](state, action) {
+    return action.tags;
+  },
 };
 
 export default function tags(state = initialState, action) {

@@ -6,7 +6,9 @@ export const COMPLETE_ALL = 'COMPLETE_ALL';
 export const CLEAR_COMPLETED = 'CLEAR_COMPLETED';
 
 export const ADD_STARMARK = 'ADD_STARMARK';
+export const ADD_STARMARKS = 'ADD_STARMARKS';
 export const EDIT_STARMARK = 'EDIT_STARMARK';
 export const DELETE_STARMARK = 'DELETE_STARMARK';
 
 export const ADD_TAG = 'ADD_TAG';
+export const ADD_TAGS = 'ADD_TAGS';

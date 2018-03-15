@@ -11,6 +11,9 @@ const actionsMap = {
       [starmark.url]: { ...oldStarmark, ...starmark }
     };
   },
+  [ActionTypes.ADD_STARMARKS](state, action) {
+    return action.starmarks;
+  },
   // [ActionTypes.EDIT_STARMARK](state, action) {
   //   return state.map(todo =>
   //     (todo.id === action.id ?

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as TodoActions from '../../app/actions/todos';
 import createStore from '../../app/store/configureStore';
 import { getState, decodeState, saveState } from '../../app/utils/bookmarkStorage';
-import { treeRecurse, nodeToStarmark, nodeToTag, getHistory, getNodeHistory } from '../../app/utils/bookmarksToStarmarks';
+import { backgroundStateRefresh } from '../../app/utils/bookmarksToStarmarks';
 
 require('../../app/utils/promisifyChrome');
 
@@ -39,48 +39,59 @@ const saveStarmark = (starmark, store) => {
       .catch(response => updateStateOffline(response, store, starmark));
 };
 
-const treeToState = (store, historyArray) => {
-  const existingState = store.getState();
-  const history = _.keyBy(historyArray, 'url');
-  let localStarmark;
-  let persistentStarmark;
-  return (node, parents) => {
-    if (node.url) {
-      //compare local storage with bookmark storage
-      if (_.startsWith(node.url, urlBase)) {
-        const stateJson = node.url.split('?starmark=')[1];
-        persistentStarmark = { ...decodeState(stateJson), ...getNodeHistory(node.title, history) };
-        if (!persistentStarmark.rating || persistentStarmark.rating === 0) {
-          persistentStarmark.rating = 1;
-        }
-        const { url } = persistentStarmark;
-        localStarmark = { ...existingState.starmarks[url] };
-        localStarmark.id = persistentStarmark.id = node.id;
-        return persistentStarmark;
-      }
-      persistentStarmark = { ...nodeToStarmark(node, parents), ...getNodeHistory(node.url, history) };
-      return persistentStarmark;
-    } else if (node.title) {
-      const tag = nodeToTag(node);
-      return tag;
-    }
-  };
-};
+// const treeToState = (store, historyArray) => {
+//   const existingState = store.getState();
+//   const history = _.keyBy(historyArray, 'url');
+//   let localStarmark;
+//   let persistentStarmark;
+//   return (node, parents) => {
+//     if (node.url) {
+//       //compare local storage with bookmark storage
+//       if (_.startsWith(node.url, urlBase)) {
+//         const stateJson = node.url.split('?starmark=')[1];
+//         persistentStarmark = { ...decodeState(stateJson), ...getNodeHistory(node.title, history) };
+//         if (!persistentStarmark.rating || persistentStarmark.rating === 0) {
+//           persistentStarmark.rating = 1;
+//         }
+//         const { url } = persistentStarmark;
+//         localStarmark = { ...existingState.starmarks[url] };
+//         localStarmark.id = persistentStarmark.id = node.id;
+//         return persistentStarmark;
+//       }
+//       persistentStarmark = { ...nodeToStarmark(node, parents), ...getNodeHistory(node.url, history) };
+//       return persistentStarmark;
+//     } else if (node.title) {
+//       const tag = nodeToTag(node);
+//       return tag;
+//     }
+//   };
+// };
 
-const backgroundStateRefresh = (store) => {
-  chrome.bookmarks.getTree((nodes) => {
-    getHistory().then((history) => {
-      const state = treeRecurse(nodes, treeToState(store, history));
-      console.log(state)
-      store.dispatch(TodoActions.addStarmarks(state.starmarks));
-      store.dispatch(TodoActions.addTags(state.tags));
-    });
-  });
-};
+// const backgroundStateRefresh = (store) => {
+//   chrome.bookmarks.getTree((nodes) => {
+//     getHistory().then((history) => {
+//       const state = treeRecurse(nodes, treeToState(store, history));
+//       console.log(state)
+//       store.dispatch(TodoActions.addStarmarks(state.starmarks));
+//       store.dispatch(TodoActions.addTags(state.tags));
+//     });
+//   });
+// };
+
+// const backgroundStateRefresh = (store) => {
+//   loadState().then((state) => {
+//     store.dispatch(TodoActions.addStarmarks(state.starmarks));
+//     store.dispatch(TodoActions.addTags(state.tags));
+//   });
+// };
 
 getState((state) => {
   const store = createStore(state);
   backgroundStateRefresh(store);
+  // loadState().then((refresh) => {
+  //   store.dispatch(TodoActions.addStarmarks(state.starmarks));
+  //   store.dispatch(TodoActions.addTags(state.tags));
+  // });
   addVisitListener(state.starmarks, (visitedStarmark) => {
     saveStarmark(visitedStarmark, store);
   });

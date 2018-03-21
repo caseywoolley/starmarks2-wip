@@ -1,4 +1,5 @@
 const timeSince = (msTime) => {
+  if (!msTime) return;
   const now = new Date();
   const timeStamp = new Date(msTime);
   const secondsPast = (now.getTime() - timeStamp.getTime()) / 1000;

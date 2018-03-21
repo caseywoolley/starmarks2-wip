@@ -42,14 +42,16 @@ export default class StarSelector extends Component {
     const { url, title } = starmark;
     const rating = parseInt(e.target.value, 10);
     this.setState({ rating });
-    chrome.runtime.sendMessage({ message: 'addStarmark', starmark: { url, title, rating } }, (response) => {
-      if (!response) {
-        // store.dispatch(TodoActions.addStarmark(newStarmark));
-        actions.addStarmark({ url, title, rating });
-      } else if (response.message) {
-        console.log(response.message);
-      }
-    });
+    actions.addStarmark({ url, title, rating });
+
+    // chrome.runtime.sendMessage({ message: 'addStarmark', starmark: { url, title, rating } }, (response) => {
+    //   if (!response) {
+    //     // store.dispatch(TodoActions.addStarmark(newStarmark));
+    //     actions.addStarmark({ url, title, rating });
+    //   } else if (response.message) {
+    //     console.log(response.message);
+    //   }
+    // });
   }
 
   render() {

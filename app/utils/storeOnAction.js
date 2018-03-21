@@ -1,5 +1,4 @@
-import { updateStarmark } from './bookmarksToStarmarks';
-import { saveState } from './bookmarkStorage';
+import { saveState, updateStarmarkBookmark } from './bookmarkStorage';
 
 export default store => next => action => {
   console.group(action.type)
@@ -9,9 +8,9 @@ export default store => next => action => {
   if (action.starmark) {
     const starmark = newState.starmarks[action.starmark.url];
     console.log('save', starmark);
-    updateStarmark(starmark);
+    updateStarmarkBookmark(starmark);
   }
-  saveState(newState);
+  // saveState(newState);
   console.groupEnd(action.type);
   return result;
 };

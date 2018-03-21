@@ -5,13 +5,16 @@ import _ from 'lodash';
 
 import Starmark from './Starmark';
 import style from './StarList.css';
+import starmarkStyle from './Starmark.css';
 
 const searchFilter = (search, starmark) => {
   return _.find(starmark.tags, { title: search });
 };
 
-const displayStarmarks = (starmarks, search) => {
-  return _.sortBy(_.toArray(starmarks), 'dateAdded').reverse(); //.filter((starmark) => {
+const displayStarmarks = (starmarks, filters) => {
+  const arr = _.sortBy(_.toArray(starmarks), filters.sortBy);
+  return filters.reverse ? arr.reverse() : arr;
+  //.filter((starmark) => {
   //   return true //_.find(starmark.tags, tag => tag.title.includes(search));
   // });
 }
@@ -48,18 +51,39 @@ export default class StarList extends Component {
     });
   }
 
+  updateFilters = (newFilters) => {
+    const { filters } = this.props;
+    const { addFilters } = this.props.actions;
+
+    newFilters.reverse = !filters.reverse;
+    if (newFilters.sortBy !== filters.sortBy) {
+      newFilters.reverse = true;
+    }
+    addFilters(newFilters);
+  }
+
   render() {
-    const { starmarks, tags } = this.props;
+    const { starmarks, tags, filters } = this.props;
     const { displayLimit, search } = this.state;
-    const starmarksArray = displayStarmarks(starmarks, search).slice(0, displayLimit);
+    const starmarksArray = displayStarmarks(starmarks, filters).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
-        {_.map(starmarksArray, (starmark, i) => (
-          <div key={starmark.url} className={classnames({ [style.oddRow]: i % 2 })}>
-            <Starmark starmark={starmark} tags={tags} updateSearch={this.updateSearch} />
-          </div>
-        ))}
-        <Waypoint key={displayLimit} onEnter={this.loadMore} />
+        <div className={[starmarkStyle.row, style.heading].join(' ')}>
+          <span className={starmarkStyle.favicon}></span>
+          <span className={starmarkStyle.title} onClick={() => this.updateFilters({ sortBy: 'title' })}>Title</span>
+          <span className={starmarkStyle.rating} onClick={() => this.updateFilters({ sortBy: 'rating' })}>Rating</span>
+          <span className={starmarkStyle.date} onClick={() => this.updateFilters({ sortBy: 'dateAdded' })}>Added</span>
+          <span className={starmarkStyle.date} onClick={() => this.updateFilters({ sortBy: 'lastVisitTime' })}>Visited</span>
+          <span className={starmarkStyle.visitCount} onClick={() => this.updateFilters({ sortBy: 'visitCount' })}>Visits</span>
+        </div>
+        <div className={style.list}>
+          {_.map(starmarksArray, (starmark, i) => (
+            <div key={starmark.url} className={classnames({ [style.oddRow]: !(i % 2) })}>
+              <Starmark starmark={starmark} tags={tags} updateSearch={this.updateSearch} />
+            </div>
+          ))}
+          <Waypoint key={displayLimit} onEnter={this.loadMore} />
+        </div>
       </div>
     );
   }

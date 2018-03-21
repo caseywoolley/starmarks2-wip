@@ -36,6 +36,7 @@ export default class SearchBar extends Component {
   }
 
   render() {
+    const { foundCount } = this.props;
     return (
       <div className={style.searchContainer}>
         <div className={style.searchBar}>
@@ -48,6 +49,7 @@ export default class SearchBar extends Component {
           <input type="text" onChange={this.handleChange} onKeyDown={this.handleKeyDown} value={this.state.input.query} />
         </div>
         <div><pre className={style.pre}>{JSON.stringify(this.state.input, null, 2) }</pre></div>
+        <div className={style.foundCount}>{foundCount} Found</div>
       </div>
     );
   }

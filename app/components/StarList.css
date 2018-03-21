@@ -1,10 +1,19 @@
 .starlist {
   padding-top: 20px;
   width: 50%;
+  min-width: 800px;
 }
 
-.starlist > div {
+.list > div {
   border-top: 1px solid rgb(235, 235, 235);
+}
+
+.heading {
+  font-size: 20px;
+}
+
+.heading > span {
+  cursor: pointer;
 }
 
 .oddRow {

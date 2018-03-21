@@ -38,14 +38,14 @@ export default class Starmark extends Component {
               </span>
             </div>
             <div className={style.tagRow}>
-              { starmark.tags.map(tagId => <span onClick={() => updateSearch(tagId)} className={style.tag} key={tagId}>{tags[tagId] ? tags[tagId].title : tagId}</span>) }
+              { (starmark.tags || []).map(tagId => <span onClick={() => updateSearch(tagId)} className={style.tag} key={tagId}>{tags[tagId] ? tags[tagId].title : tagId}</span>) }
             </div>
           </span>
-          <span className={style.stars}>
+          <span className={[style.stars, style.rating].join(' ')}>
             <StarSelector starmark={starmark} />
           </span>
           <span className={style.date}>{timeSince(starmark.dateAdded)}</span>
-          <span className={style.date}>{timeSince(starmark.lastVisitTime)}</span>
+          <span className={style.date}>{timeSince(starmark.lastVisitTime) }</span>
           <span className={style.visitCount}>{starmark.visitCount || 0}</span>
         </div>
       </div>

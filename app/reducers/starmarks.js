@@ -12,8 +12,11 @@ const actionsMap = {
     };
   },
   [ActionTypes.ADD_STARMARKS](state, action) {
-    return action.starmarks;
+    return { ...action.starmarks };
   },
+  [ActionTypes.REFRESH_STATE](state) {
+    return { ...state };
+  }
   // [ActionTypes.EDIT_STARMARK](state, action) {
   //   return state.map(todo =>
   //     (todo.id === action.id ?

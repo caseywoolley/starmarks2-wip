@@ -1,26 +1,21 @@
-import _ from 'lodash';
 import * as TodoActions from '../../app/actions/todos';
 import createStore from '../../app/store/configureStore';
-import { getState, decodeState, saveState } from '../../app/utils/bookmarkStorage';
-import { backgroundStateRefresh } from '../../app/utils/bookmarksToStarmarks';
+import { getState, stateRefresh, updateStarmarkBookmark } from '../../app/utils/bookmarkStorage';
 
 require('../../app/utils/promisifyChrome');
 
-const urlBase = 'http://www.starmarks.com/?starmark=';
-
-const addVisitListener = (starmarks, addStarmark) => {
+const addVisitListener = (callback) => {
   chrome.history.onVisited.addListener((history) => {
-    if (!starmarks[history.url]) {
-      console.log('not a bookmark', history.url, starmarks[history.url]);
-      return;
-    }
-    console.log(`registered visit: ${history.title}`);
-    const starmark = starmarks[history.url];
-    const { visitCount, lastVisitTime } = history;
-    addStarmark({
-      ...starmark,
-      visitCount,
-      lastVisitTime
+    getState((state) => {
+      const starmarks = state.starmarks;
+      if (!starmarks[history.url]) {
+        console.log('not a bookmark', history.url);
+        return;
+      }
+      console.log(`registered visit: ${history.title}`);
+      const starmark = starmarks[history.url];
+      const { visitCount, lastVisitTime } = history;
+      callback({ ...starmark, visitCount, lastVisitTime });
     });
   });
 };
@@ -31,71 +26,35 @@ const logResponse = (response) => {
 
 const updateStateOffline = (response, store, starmark) => {
   store.dispatch(TodoActions.addStarmark(starmark));
+  // updateStarmarkBookmark(starmark);
 };
 
 const saveStarmark = (starmark, store) => {
+  // updateStateOffline(null, store, starmark);
+  // chrome.runtime.sendMessageAsync({ message: 'refreshState' });
   chrome.runtime.sendMessageAsync({ message: 'addStarmark', starmark })
       .then(logResponse)
       .catch(response => updateStateOffline(response, store, starmark));
 };
 
-// const treeToState = (store, historyArray) => {
-//   const existingState = store.getState();
-//   const history = _.keyBy(historyArray, 'url');
-//   let localStarmark;
-//   let persistentStarmark;
-//   return (node, parents) => {
-//     if (node.url) {
-//       //compare local storage with bookmark storage
-//       if (_.startsWith(node.url, urlBase)) {
-//         const stateJson = node.url.split('?starmark=')[1];
-//         persistentStarmark = { ...decodeState(stateJson), ...getNodeHistory(node.title, history) };
-//         if (!persistentStarmark.rating || persistentStarmark.rating === 0) {
-//           persistentStarmark.rating = 1;
-//         }
-//         const { url } = persistentStarmark;
-//         localStarmark = { ...existingState.starmarks[url] };
-//         localStarmark.id = persistentStarmark.id = node.id;
-//         return persistentStarmark;
-//       }
-//       persistentStarmark = { ...nodeToStarmark(node, parents), ...getNodeHistory(node.url, history) };
-//       return persistentStarmark;
-//     } else if (node.title) {
-//       const tag = nodeToTag(node);
-//       return tag;
-//     }
-//   };
-// };
-
-// const backgroundStateRefresh = (store) => {
-//   chrome.bookmarks.getTree((nodes) => {
-//     getHistory().then((history) => {
-//       const state = treeRecurse(nodes, treeToState(store, history));
-//       console.log(state)
-//       store.dispatch(TodoActions.addStarmarks(state.starmarks));
-//       store.dispatch(TodoActions.addTags(state.tags));
-//     });
-//   });
-// };
-
-// const backgroundStateRefresh = (store) => {
-//   loadState().then((state) => {
-//     store.dispatch(TodoActions.addStarmarks(state.starmarks));
-//     store.dispatch(TodoActions.addTags(state.tags));
-//   });
-// };
-
-getState((state) => {
-  const store = createStore(state);
-  backgroundStateRefresh(store);
-  // loadState().then((refresh) => {
-  //   store.dispatch(TodoActions.addStarmarks(state.starmarks));
-  //   store.dispatch(TodoActions.addTags(state.tags));
-  // });
-  addVisitListener(state.starmarks, (visitedStarmark) => {
-    saveStarmark(visitedStarmark, store);
+const initialize = () => {
+  getState((state) => {
+    const store = createStore(state);
+    stateRefresh(store);
+    addVisitListener((visitedStarmark) => {
+      saveStarmark(visitedStarmark, store);
+    });
   });
-});
+};
+
+export const backgroundStateRefresh = () => {
+  getState((state) => {
+    const store = createStore(state);
+    stateRefresh(store);
+  });
+};
+
+initialize();
 
 require('./background/contextMenus');
 // require('./background/inject');

@@ -16,6 +16,15 @@ export function addTags(tags) {
   return { type: types.ADD_TAGS, tags };
 }
 
+export function addFilters(filters) {
+  return { type: types.ADD_FILTERS, filters };
+}
+
+export function refreshState() {
+  return { type: types.REFRESH_STATE };
+}
+
+
 export function addTodo(text) {
   return { type: types.ADD_TODO, text };
 }

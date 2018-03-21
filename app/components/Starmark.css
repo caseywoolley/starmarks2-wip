@@ -13,7 +13,7 @@
 }
 
 .row > span {
-  flex: 1;
+  /* flex: 1; */
   padding: 10px 5px;
   display: inline-block;
   vertical-align: middle;
@@ -21,13 +21,14 @@
 
 .stars {
   font-size: 20px;
-  min-width: 6em;
-  max-width: 6em;
+}
+
+.rating {
+  flex: 0 0 105px;
 }
 
 .favicon {
-  max-width: 16px;
-  min-width: 16px;
+  flex: 0 0 16px;
 }
 
 .favicon img {
@@ -36,17 +37,15 @@
 }
 
 .date {
-  max-width: 6em;
-  min-width: 6em;
+  flex: 0 0 105px;
 }
 
 .visitCount {
-  max-width: 3em;
-  min-width: 3em;
+  flex: 0 0 50px;
 }
 
 .title {
-  width: 100px;
+  flex: 1 0 200px;
 }
 
 .title,

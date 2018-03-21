@@ -12,3 +12,6 @@ export const DELETE_STARMARK = 'DELETE_STARMARK';
 
 export const ADD_TAG = 'ADD_TAG';
 export const ADD_TAGS = 'ADD_TAGS';
+
+export const ADD_FILTERS = 'ADD_FILTERS';
+export const REFRESH_STATE = 'REFRESH_STATE';

@@ -13,7 +13,7 @@ const actionsMap = {
     };
   },
   [ActionTypes.ADD_TAGS](state, action) {
-    return action.tags;
+    return { ...action.tags };
   },
 };
 

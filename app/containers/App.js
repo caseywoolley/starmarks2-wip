@@ -18,7 +18,8 @@ chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
 @connect(
   state => ({
     starmarks: state.starmarks,
-    tags: state.tags
+    tags: state.tags,
+    filters: state.filters
   }),
   dispatch => ({
     actions: bindActionCreators(TodoActions, dispatch)
@@ -39,6 +40,13 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    // const { refreshState } = this.props.actions;
+    // chrome.runtime.onMessage.addListener(
+    //   (request) => {
+    //     if (request.message === 'refreshState') {
+    //       refreshState();
+    //     }
+    //   });
     const { addStarmark } = this.props.actions;
     chrome.runtime.onMessage.addListener(
       (request, sender, sendResponse) => {
@@ -63,15 +71,15 @@ export default class App extends Component {
   }
 
   render() {
-    const { starmarks, tags, actions } = this.props;
+    const { starmarks, tags, filters, actions } = this.props;
     const { isEditing } = this.state;
     const starmark = starmarks[activeTab.url] || activeTab;
     return (
       <div >
         { !isPopup &&
           <div className={style.container}>
-            <SearchBar />
-            <StarList starmarks={starmarks} tags={tags} actions={actions} />
+            <SearchBar foundCount={Object.keys(starmarks).length} />
+            <StarList starmarks={starmarks} tags={tags} filters={filters} actions={actions} />
           </div>
         }
         { isPopup &&

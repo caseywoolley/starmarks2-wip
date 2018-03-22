@@ -25,7 +25,7 @@ const buildStorageFolder = () => ({
   title: storageFolderTitle
 });
 
-export const getHistory = () => chrome.history.searchAsync({ text: '', startTime: 0, maxResults: 0 });
+export const getAllHistory = () => chrome.history.searchAsync({ text: '', startTime: 0, maxResults: 0 });
 const createStarmarkFolder = _.memoize(() => chrome.bookmarks.createAsync(buildStorageFolder()));
 const getStarmarkFolder = () => chrome.bookmarks.searchAsync({ title: storageFolderTitle })
   .then(([starmarkFolder]) => starmarkFolder || createStarmarkFolder());
@@ -59,106 +59,178 @@ export const getNodeHistory = (url, history) => {
   return { visitCount: 0, lastVisitTime: 0 };
 };
 
-export const treeRecurse = (nodes, process, parents = []) => {
-  let state = { starmarks: {}, tags: {} };
-  let childrenState = { starmarks: {}, tags: {} };
-  nodes.forEach((node) => {
-    if (node.url) {
-      const starmark = process(node, parents);
-      state.starmarks[starmark.url] = starmark;
-    } else if (node.title) {
-      state.tags[node.id] = process(node, parents);
-    }
-    if (node.children) {
-      const parent = node.title ? node : [];
-      childrenState = treeRecurse(node.children, process, parents.concat(parent));
-    }
-    state = {
-      starmarks: { ...state.starmarks, ...childrenState.starmarks },
-      tags: { ...state.tags, ...childrenState.tags }
-    };
-  });
-  return { starmarks: { ...state.starmarks }, tags: { ...state.tags } };
-};
+// export const treeRecurse = (nodes, process, parents = []) => {
+//   let state = { starmarks: {}, tags: {} };
+//   let childrenState = { starmarks: {}, tags: {} };
+//   nodes.forEach((node) => {
+//     if (node.url) {
+//       const starmark = process(node, parents);
+//       state.starmarks[starmark.url] = starmark;
+//     } else if (node.title) {
+//       state.tags[node.id] = process(node, parents);
+//     }
+//     if (node.children) {
+//       const parent = node.title ? node : [];
+//       childrenState = treeRecurse(node.children, process, parents.concat(parent));
+//     }
+//     state = {
+//       starmarks: { ...state.starmarks, ...childrenState.starmarks },
+//       tags: { ...state.tags, ...childrenState.tags }
+//     };
+//   });
+//   return { starmarks: { ...state.starmarks }, tags: { ...state.tags } };
+// };
 
 export const nodeToTag = ({ title, id, parentId }) => ({ title, id, parentId });
 export const nodeToStarmark = ({ url, dateAdded, id, parentId, title }, parents) => ({ url, dateAdded, id, bookmarkIds: [id], parentId, title, tags: _.map(parents, 'id'), rating: 1 });
 const isDataUrl = url => _.startsWith(url, urlBase);
+
 const dataUrlToStarmark = (url) => {
   const stateJson = url.split('?starmark=')[1];
   const starmark = decodeState(stateJson);
   return { ...starmark, ...getNodeHistory(starmark.title, history) };
 };
 
-const treeToState = (historyArray, state = { starmarks: {}, tags: {} }) => {
-  const history = _.keyBy(historyArray, 'url');
-  // let localStarmark;
-  return (node, parents) => {
-    if (node.url) {
-      //return bookmarkStarmark if exists
-      if (isDataUrl(node.url)) {
-        return dataUrlToStarmark(node.url);
-      }
-      //if exists in state check for extra ids
-      const existingStarmark = state.starmarks[node.url];
-      if (existingStarmark) {
-        if (!_.includes(existingStarmark.bookmarkIds, node.id)) {
-          return { ...existingStarmark, bookmarkIds: [...existingStarmark.bookmarkIds, node.id] };
-        }
-        return existingStarmark;
-      }
-      //turn bookmark into starmark
-      const newStarmark = { ...nodeToStarmark(node, parents), ...getNodeHistory(node.url, history) };
-      return newStarmark;
-    } else if (node.title) {
-      const tag = nodeToTag(node);
-      return tag;
-    }
-  };
-};
+// const treeToState = (historyArray, state = { starmarks: {}, tags: {} }) => {
+//   const history = _.keyBy(historyArray, 'url');
+//   // let localStarmark;
+//   return (node, parents) => {
+//     if (node.url) {
+//       //return bookmarkStarmark if exists
+//       if (isDataUrl(node.url)) {
+//         return dataUrlToStarmark(node.url);
+//       }
+//       //if exists in state check for extra ids
+//       const existingStarmark = state.starmarks[node.url];
+//       if (existingStarmark) {
+//         if (!_.includes(existingStarmark.bookmarkIds, node.id)) {
+//           return { ...existingStarmark, bookmarkIds: [...existingStarmark.bookmarkIds, node.id] };
+//         }
+//         return existingStarmark;
+//       }
+//       //turn bookmark into starmark
+//       const newStarmark = { ...nodeToStarmark(node, parents), ...getNodeHistory(node.url, history) };
+//       return newStarmark;
+//     } else if (node.title) {
+//       const tag = nodeToTag(node);
+//       return tag;
+//     }
+//   };
+// };
 
+const getBookmarkTree = () => chrome.bookmarks.getTreeAsync();
 const getStarmarkBookmarks = () => getStarmarkFolder()
   .then(folder => chrome.bookmarks.getSubTreeAsync(folder.id));
 
-export const loadState = () => {
-  return getHistory()
-    .then((history) => {
-      return getStarmarkBookmarks().then((starmarkNodes) => {
-        return treeRecurse(starmarkNodes, treeToState(history));
-      }).then((starmarkState) => {
-        return chrome.bookmarks.getTreeAsync().then((nodes) => {
-          const state = treeRecurse(nodes, treeToState(history, starmarkState));
-          return state;
-        });
-      });
-    });
+// export const loadState = () => {
+//   return getAllHistory()
+//     .then((history) => {
+//       return getStarmarkBookmarks().then((starmarkNodes) => {
+//         return treeRecurse(starmarkNodes, treeToState(history));
+//       }).then((starmarkState) => {
+//         return chrome.bookmarks.getTreeAsync().then((nodes) => {
+//           const state = treeRecurse(nodes, treeToState(history, starmarkState));
+//           return state;
+//         });
+//       });
+//     });
+// };
+
+export const stateRefresh = async (store) => {
+  const state = await loadState();
+  store.dispatch(TodoActions.addStarmarks(state.starmarks));
+  store.dispatch(TodoActions.addTags(state.tags));
 };
 
-export const stateRefresh = (store) => {
-  loadState().then((state) => {
-    store.dispatch(TodoActions.addStarmarks(state.starmarks));
-    store.dispatch(TodoActions.addTags(state.tags));
+
+// export default treeRecurse;
+
+const treeToHash = (nodes, parentNodes) => {
+  let urlHash = {};
+  const parents = parentNodes || [];
+  nodes.forEach((node) => {
+    urlHash[node.id] = { ...node, parents };
+    const childHash = node.children ? treeToHash(node.children, parents.concat(node)) : {};
+    urlHash = { ...urlHash, ...childHash };
   });
+  return urlHash;
 };
 
 
-export default treeRecurse;
 
-// const treeRecurse = (nodes, parentNodes) => {
-//   let urlHash = {};
-//   const parents = parentNodes || [];
-//   nodes.forEach((node) => {
-//     urlHash[node.id] = { ...node, parents };
-//     const childHash = node.children ? treeRecurse(node.children, parents.concat(node)) : {};
-//     urlHash = { ...urlHash, ...childHash };
-//   });
-//   return urlHash;
+// const getNodeToStateReducer = (state, node) => {
+//   if (node.url) {
+//     //return bookmarkStarmark if exists
+//     if (isDataUrl(node.url)) {
+//       const starmark = dataUrlToStarmark(node.url);
+//       return { starmarks: { ...(state.starmarks || {}), [starmark.url]: starmark }, tags: (state.tags || {}) };
+//     }
+//     //if exists in state check for extra ids
+//     const existingStarmark = state.starmarks[node.url];
+//     if (existingStarmark) {
+//       if (!_.includes(existingStarmark.bookmarkIds, node.id)) {
+//         const starmark = { ...existingStarmark, bookmarkIds: [...existingStarmark.bookmarkIds, node.id] };
+//         return { starmarks: { ...(state.starmarks || {}), [starmark.url]: starmark }, tags: (state.tags || {}) };
+//       }
+//       return state;
+//     }
+//     //turn bookmark into starmark
+//     // ...getNodeHistory(node.url, history)
+//     const starmark = { ...nodeToStarmark(node, node.parents) };
+//     return { starmarks: { ...(state.starmarks || {}), [starmark.url]: starmark }, tags: (state.tags || {}) };
+//   } else if (node.title) {
+//     const tag = nodeToTag(node);
+//     return { starmarks: (state.starmarks || {}), tags: { ...(state.tags || {}), [tag.id]: tag } };
+//   }
+//   return state;
 // };
 
-// const loadState = async (nodes, callback) => {
-//   const history = getHistory();
-//   const hash = treeRecurse(nodes);
-//   const state = hashToState(hash, history);
-//   debugger
-//   callback(state);
-// };
+export const getHistory = async () => {
+  //TODO: refactor get history, history might have multiple records per url
+  const historyArray = await getAllHistory();
+  const history = _.keyBy(historyArray, 'url');
+  return history;
+};
+
+const bookmarkHashToState = async (hash) => {
+  const history = await getHistory();
+  const state = { starmarks: {}, tags: {} };
+  _.forEach(hash, (node, id) => {
+    if (node.url) {
+      //return bookmarkStarmark if exists
+      const existingStarmark = { ...state.starmarks[node.url], ...getNodeHistory(node.url, history) };
+      if (isDataUrl(node.url)) {
+        const starmark = dataUrlToStarmark(node.url);
+        state.starmarks[starmark.url] = starmark;
+      } else if (existingStarmark.url) { //if exists in state check for extra ids
+        if (!_.includes(existingStarmark.bookmarkIds, node.id)) {
+          const starmark = { ...existingStarmark, bookmarkIds: [...existingStarmark.bookmarkIds, node.id] };
+          state.starmarks[starmark.url] = starmark;
+        }
+      } else { //turn bookmark into starmark
+        const starmark = { ...nodeToStarmark(node, node.parents), ...getNodeHistory(node.url, history) };
+        state.starmarks[starmark.url] = starmark;
+      }
+
+      // ...getNodeHistory(node.url, history)
+    } else if (node.title) {
+      const tag = nodeToTag(node);
+      state.tags[tag.id] = tag;
+    }
+  });
+  return state;
+};
+
+
+
+const loadState = async () => {
+  // const starmarkBookmarks = await getStarmarkBookmarks();
+  // const starmarkHash = _.pickBy(bookmarkHash, node => isDataUrl(node.url));
+  const bookmarkTree = await getBookmarkTree();
+  const bookmarkHash = treeToHash(bookmarkTree);
+  const state = await bookmarkHashToState(bookmarkHash);
+  // const state = _.reduce(bookmarkHash, getNodeToStateReducer, {});
+  // const state = hashToState(hash, history);
+  debugger
+  return state;
+};

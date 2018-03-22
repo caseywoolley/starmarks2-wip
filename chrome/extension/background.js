@@ -4,16 +4,16 @@ import { getState, stateRefresh, updateStarmarkBookmark } from '../../app/utils/
 
 require('../../app/utils/promisifyChrome');
 
-const addVisitListener = (callback) => {
+const addVisitListener = async (callback) => {
   chrome.history.onVisited.addListener((history) => {
     getState((state) => {
       const starmarks = state.starmarks;
-      if (!starmarks[history.url]) {
+      const starmark = starmarks[history.url];
+      if (!starmark) {
         console.log('not a bookmark', history.url);
         return;
       }
       console.log(`registered visit: ${history.title}`);
-      const starmark = starmarks[history.url];
       const { visitCount, lastVisitTime } = history;
       callback({ ...starmark, visitCount, lastVisitTime });
     });
@@ -47,12 +47,12 @@ const initialize = () => {
   });
 };
 
-export const backgroundStateRefresh = () => {
-  getState((state) => {
-    const store = createStore(state);
-    stateRefresh(store);
-  });
-};
+// export const backgroundStateRefresh = () => {
+//   getState((state) => {
+//     const store = createStore(state);
+//     stateRefresh(store);
+//   });
+// };
 
 initialize();
 

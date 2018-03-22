@@ -12,7 +12,7 @@ const actionsMap = {
     };
   },
   [ActionTypes.ADD_STARMARKS](state, action) {
-    return { ...action.starmarks };
+    return { ...state, ...action.starmarks };
   },
   [ActionTypes.REFRESH_STATE](state) {
     return { ...state };

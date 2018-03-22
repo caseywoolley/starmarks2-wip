@@ -10,7 +10,7 @@ export default store => next => action => {
     console.log('save', starmark);
     updateStarmarkBookmark(starmark);
   }
-  // saveState(newState);
+  saveState(newState);
   console.groupEnd(action.type);
   return result;
 };

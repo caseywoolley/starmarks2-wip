@@ -12,11 +12,12 @@ export default class SearchBar extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({
-      input: {
-        query: e.target.value
-      }
-    });
+    // this.setState({
+    //   input: {
+    //     query: e.target.value
+    //   }
+    // });
+    this.props.addFilters({ query: e.target.value });
   }
 
   handleKeyDown = (e) => {

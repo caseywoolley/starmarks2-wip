@@ -7,18 +7,6 @@ import Starmark from './Starmark';
 import style from './StarList.css';
 import starmarkStyle from './Starmark.css';
 
-const searchFilter = (search, starmark) => {
-  return _.find(starmark.tags, { title: search });
-};
-
-const displayStarmarks = (starmarks, filters) => {
-  const arr = _.sortBy(_.toArray(starmarks), filters.sortBy);
-  return filters.reverse ? arr.reverse() : arr;
-  //.filter((starmark) => {
-  //   return true //_.find(starmark.tags, tag => tag.title.includes(search));
-  // });
-}
-
 export default class StarList extends Component {
 
   static propTypes = {
@@ -35,8 +23,8 @@ export default class StarList extends Component {
   }
 
   loadMore = () => {
-    console.log(displayStarmarks(this.props.starmarks, this.state.search).length)
-    if (this.state.displayLimit < displayStarmarks(this.props.starmarks, this.state.search).length) {
+    // console.log(filterStarmarks(this.props.starmarks, this.state.search).length)
+    if (this.state.displayLimit < this.props.results.length) {
       this.setState({
         displayLimit: this.state.displayLimit + 30
       });
@@ -63,9 +51,9 @@ export default class StarList extends Component {
   }
 
   render() {
-    const { starmarks, tags, filters } = this.props;
+    const { starmarks, tags, filters, results } = this.props;
     const { displayLimit, search } = this.state;
-    const starmarksArray = displayStarmarks(starmarks, filters).slice(0, displayLimit);
+    // const results = filterStarmarks(starmarks, filters).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         <div className={[starmarkStyle.row, style.heading].join(' ')}>
@@ -77,7 +65,7 @@ export default class StarList extends Component {
           <span className={starmarkStyle.visitCount} onClick={() => this.updateFilters({ sortBy: 'visitCount' })}>Visits</span>
         </div>
         <div className={style.list}>
-          {_.map(starmarksArray, (starmark, i) => (
+          {_.map(results.slice(0, displayLimit), (starmark, i) => (
             <div key={starmark.url} className={classnames({ [style.oddRow]: !(i % 2) })}>
               <Starmark starmark={starmark} tags={tags} updateSearch={this.updateSearch} />
             </div>

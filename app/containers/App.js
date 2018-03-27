@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import * as TodoActions from '../actions/todos';
 
 import StarmarkTextInput from '../components/StarmarkTextInput';
@@ -14,6 +15,19 @@ let activeTab;
 chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
   activeTab = tabs[0];
 });
+
+
+const filterStarmarks = (starmarks, filters) => {
+  let results = _.sortBy(_.toArray(starmarks), filters.sortBy);
+  if (filters.query && filters.query.trim()) {
+    results = _.filter(results, result => _.some(result, val => _.includes(val, filters.query.trim())));
+  }
+  return filters.reverse ? results.reverse() : results;
+  //.filter((starmark) => {
+  //   return true //_.find(starmark.tags, tag => tag.title.includes(search));
+  // });
+};
+
 
 @connect(
   state => ({
@@ -74,12 +88,13 @@ export default class App extends Component {
     const { starmarks, tags, filters, actions } = this.props;
     const { isEditing } = this.state;
     const starmark = starmarks[activeTab.url] || activeTab;
+    const results = filterStarmarks(starmarks, filters);
     return (
       <div >
         { !isPopup &&
           <div className={style.container}>
-            <SearchBar foundCount={Object.keys(starmarks).length} />
-            <StarList starmarks={starmarks} tags={tags} filters={filters} actions={actions} />
+            <SearchBar addFilters={actions.addFilters} foundCount={results.length} />
+            <StarList results={results} starmarks={starmarks} tags={tags} filters={filters} actions={actions} />
           </div>
         }
         { isPopup &&

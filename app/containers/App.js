@@ -16,11 +16,19 @@ chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
   activeTab = tabs[0];
 });
 
+const containsString = (str, testStr) => _.includes(str.toLowerCase(), testStr.toLowerCase());
+// const findNestedString = (node, str) => {
+//   return _.some(node, field => (_.isString(field)
+//     ? containsString(field, str) : findNestedString(field)));
+// };
 
 const filterStarmarks = (starmarks, filters) => {
   let results = _.sortBy(_.toArray(starmarks), filters.sortBy);
-  if (filters.query && filters.query.trim()) {
-    results = _.filter(results, result => _.some(result, val => _.includes(val, filters.query.trim())));
+  const query = _.get(filters, 'query', '').trim();
+  if (query) {
+    results = _.filter(results, result => _.some(result, field => (_.isString(field)
+        ? containsString(field, query)
+        : _.some(field, val => containsString(val, query)))));
   }
   return filters.reverse ? results.reverse() : results;
   //.filter((starmark) => {
@@ -93,7 +101,7 @@ export default class App extends Component {
       <div >
         { !isPopup &&
           <div className={style.container}>
-            <SearchBar addFilters={actions.addFilters} foundCount={results.length} />
+            <SearchBar addFilters={actions.addFilters} filters={filters} foundCount={results.length} />
             <StarList results={results} starmarks={starmarks} tags={tags} filters={filters} actions={actions} />
           </div>
         }

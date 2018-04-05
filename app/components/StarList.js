@@ -39,30 +39,31 @@ export default class StarList extends Component {
     });
   }
 
-  updateFilters = (newFilters) => {
-    const { filters } = this.props;
-    const { addFilters } = this.props.actions;
+  updateSort = (newSort) => {
+    const { search } = this.props;
+    const { updateSearch } = this.props.actions;
 
-    newFilters.reverse = !filters.reverse;
-    if (newFilters.sortBy !== filters.sortBy) {
-      newFilters.reverse = true;
+    const update = { ...newSort };
+    update.reverse = !search.reverse;
+    if (update.sortBy !== search.sortBy) {
+      update.reverse = true;
     }
-    addFilters(newFilters);
+    updateSearch(update);
   }
 
   render() {
-    const { starmarks, tags, filters, results } = this.props;
-    const { displayLimit, search } = this.state;
-    // const results = filterStarmarks(starmarks, filters).slice(0, displayLimit);
+    const { tags, results } = this.props;
+    const { displayLimit } = this.state;
+    // const results = filterStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         <div className={[starmarkStyle.row, style.heading].join(' ')}>
-          <span className={starmarkStyle.favicon}></span>
-          <span className={starmarkStyle.title} onClick={() => this.updateFilters({ sortBy: 'title' })}>Title</span>
-          <span className={starmarkStyle.rating} onClick={() => this.updateFilters({ sortBy: 'rating' })}>Rating</span>
-          <span className={starmarkStyle.date} onClick={() => this.updateFilters({ sortBy: 'dateAdded' })}>Added</span>
-          <span className={starmarkStyle.date} onClick={() => this.updateFilters({ sortBy: 'lastVisitTime' })}>Visited</span>
-          <span className={starmarkStyle.visitCount} onClick={() => this.updateFilters({ sortBy: 'visitCount' })}>Visits</span>
+          <span className={starmarkStyle.favicon} />
+          <span className={starmarkStyle.title} onClick={() => this.updateSort({ sortBy: 'title' })}>Title</span>
+          <span className={starmarkStyle.rating} onClick={() => this.updateSort({ sortBy: 'rating' })}>Rating</span>
+          <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'dateAdded' })}>Added</span>
+          <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'lastVisitTime' })}>Visited</span>
+          <span className={starmarkStyle.visitCount} onClick={() => this.updateSort({ sortBy: 'visitCount' })}>Visits</span>
         </div>
         <div className={style.list}>
           {_.map(results.slice(0, displayLimit), (starmark, i) => (

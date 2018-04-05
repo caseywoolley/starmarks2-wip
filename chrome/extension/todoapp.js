@@ -5,7 +5,6 @@ import './todoapp.css';
 import { getState } from '../../app/utils/bookmarkStorage';
 import createStore from '../../app/store/configureStore';
 
-
 const renderApp = (state) => {
   ReactDOM.render(
     <Root store={createStore(state)} />,

@@ -1,9 +1,12 @@
 import React, { Component, PropTypes } from 'react';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 import _ from 'lodash';
+import * as TodoActions from '../actions/todos';
 import style from './SearchBar.css';
 
 
-const searchParams = [
+const searchFilters = [
   { key: 'stars', name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
   { key: 'visits', name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
   { key: 'dateAdded', name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
@@ -18,63 +21,69 @@ const keyCodes = {
   backspace: 8
 };
 
+@connect(
+  state => ({
+    search: state.search
+  }),
+  dispatch => ({
+    actions: bindActionCreators(TodoActions, dispatch)
+  })
+)
 export default class SearchBar extends Component {
 
   static propTypes = {
-    addFilters: PropTypes.func.isRequired,
-    filters: PropTypes.object.isRequired,
+    updateSearch: PropTypes.func.isRequired,
+    search: PropTypes.object.isRequired,
+    actions: PropTypes.object.isRequired,
     foundCount: PropTypes.number.isRequired
   };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedParam: -1
-    };
+  getCurrentInput = () => (this.lastFilterInput ? this.lastFilterInput : this.searchInput);
+  filterIsEmpty = index => !this.props.search.filters[index].value;
+
+  addNewFilter = (e) => {
+    const { resetQuery, addFilter } = this.props.actions;
+    e.preventDefault();
+    const filterName = e.target.value.trim();
+    resetQuery();
+    if (filterName !== '') {
+      addFilter(filterName);
+    }
+    this.getCurrentInput().focus();
+  }
+
+  selectLastFilterInput = (e) => {
+    const { search } = this.props;
+    if (search.query === '') {
+      e.preventDefault();
+      // this.getCurrentInput().focus();
+      this.lastFilterInput.focus();
+    }
+  }
+
+  removeFilterIfEmpty = (e, index) => {
+    e.preventDefault();
+    if (this.filterIsEmpty(index)) {
+      this.handleRemoveFilter(index);
+    }
+    this.searchInput.focus();
+  }
+
+  removeFilterIfEmptyOnBackspace = (e, index) => {
+    if (this.filterIsEmpty(index)) {
+      e.preventDefault();
+      this.handleRemoveFilter(index);
+    }
   }
 
   searchKeyHandlers = {
-    [keyCodes.tab]: (e) => {
-      const { filters, addFilters } = this.props;
-      e.preventDefault();
-      const name = e.target.value.trim();
-      const updates = { query: '' };
-      if (name !== '') {
-        updates.params = [...(filters.params || []), { name }];
-        this.setState({ selectedParam: (this.params || []).length });
-      }
-      addFilters(updates);
-    },
-    [keyCodes.backspace]: (e) => {
-      const { filters } = this.props;
-      if (filters.query === '' && this.lastParamInput) {
-        e.preventDefault();
-        this.lastParamInput.focus();
-      }
-    }
+    [keyCodes.tab]: this.addNewFilter,
+    [keyCodes.backspace]: this.selectLastFilterInput
   };
 
-  paramKeyHandlers = {
-    [keyCodes.tab]: (e, index) => {
-      const { filters } = this.props;
-      e.preventDefault();
-      const param = filters.params[index];
-      if (!param.value || param.value === '') {
-        this.handleRemoveTag(index);
-      }
-      this.searchInput.focus();
-    },
-    [keyCodes.backspace]: (e, index) => {
-      const { filters, addFilters } = this.props;
-      const param = filters.params[index];
-      if (!param.value || param.value === '') {
-        e.preventDefault();
-        addFilters({
-          params: (filters.params || []).slice(0, -1)
-        });
-        this.searchInput.focus();
-      }
-    }
+  filterKeyHandlers = {
+    [keyCodes.tab]: this.removeFilterIfEmpty,
+    [keyCodes.backspace]: this.removeFilterIfEmptyOnBackspace
   };
 
   componentDidMount() {
@@ -82,7 +91,7 @@ export default class SearchBar extends Component {
   }
 
   handleChange = (e) => {
-    this.props.addFilters({ query: e.target.value });
+    this.props.updateSearch({ query: e.target.value });
   }
 
   handleFocus = (event) => {
@@ -96,71 +105,58 @@ export default class SearchBar extends Component {
     }
   }
 
-  handleParamKeyDown = (e, index) => {
-    const keyHandler = this.paramKeyHandlers[e.keyCode];
+  handleFilterKeyDown = (e, index) => {
+    const keyHandler = this.filterKeyHandlers[e.keyCode];
     if (keyHandler) {
       keyHandler(e, index);
     }
   }
 
-  handleRemoveTag = (index) => {
-    const { filters, addFilters } = this.props;
-    addFilters({
-      params: filters.params.filter((item, i) => i !== index)
-    });
+  handleRemoveFilter = (index) => {
+    const { removeFilter } = this.props.actions;
+    removeFilter(index);
     this.searchInput.focus();
   }
 
-  handleClickParam = (index) => {
-    this.setState({
-      selectedParam: index
-    });
+  handleClickFilter = (index) => {
+
   }
 
-  isSelectedParam = (index) => {
-    const { selectedParam } = this.state;
-    return selectedParam === index;
-  }
-
-  setParamValue = (e, i) => {
-    const { filters, addFilters } = this.props;
+  setFilterValue = (e, i) => {
+    const { search, updateSearch } = this.props;
+    const { updateFilter } = this.props.actions;
     const value = e.target.value.trim();
-    // if (value !== '') {
-    const updatedParam = { ...filters.params[i], value };
-    addFilters({
-      params: [...filters.params.slice(0, i), updatedParam, ...filters.params.slice(i + 1)]
-    });
+    const updatedFilter = { ...search.filters[i], value };
+    updateFilter(updatedFilter, i);
+    // updateSearch({
+    //   filters: [...search.filters.slice(0, i), updatedFilter, ...search.filters.slice(i + 1)]
+    // });
   }
 
-  setLastParamInput = (input, i) => {
-    const paramsLength = _.get(this, 'props.filters.params', []).length;
-    if (i === paramsLength - 1) {
-      this.lastParamInput = input;
-      this.selectedParam = i;
-    } else {
-      this.lastParamInput = null;
-    }
+  setLastFilterInput = (input, i) => {
+    const filtersLength = _.get(this, 'props.search.filters', []).length;
+    this.lastFilterInput = (i === filtersLength - 1) ? input : null;
   };
 
   render() {
-    const { foundCount, filters } = this.props;
+    const { foundCount, search } = this.props;
     return (
       <div className={style.searchContainer}>
         <div className={style.searchBar}>
-          {(filters.params || []).map((param, i) =>
-            <li key={i} className={style.params} onClick={() => this.handleClickParam(i)}>
-              <span>{param.name}</span>
+          {(search.filters || []).map((filter, i) =>
+            <li key={i} className={style.filters} onClick={() => this.handleClickFilter(i)}>
+              <span>{filter.name}</span>
               <input
                 type="text"
-                ref={input => this.setLastParamInput(input, i)}
+                ref={input => this.setLastFilterInput(input, i)}
                 onClick={(e) => { e.stopPropagation(); }}
-                autoFocus={() => this.isSelectedParam(i)}
+                autoFocus="true"
                 onFocus={this.handleFocus}
-                onChange={e => this.setParamValue(e, i)}
-                onKeyDown={e => this.handleParamKeyDown(e, i)}
-                value={param.value}
+                onChange={e => this.setFilterValue(e, i)}
+                onKeyDown={e => this.handleFilterKeyDown(e, i)}
+                value={filter.value}
               />
-              <span onClick={() => this.handleRemoveTag(i)}>x</span>
+              <span onClick={() => this.handleRemoveFilter(i)}>x</span>
             </li>
           )}
           <input
@@ -169,12 +165,11 @@ export default class SearchBar extends Component {
             onChange={this.handleChange}
             onKeyDown={this.handleSearchKeyDown}
             onFocus={this.handleFocus}
-            value={filters.query}
+            value={search.query}
           />
         </div>
         <div className={style.foundCount}>{foundCount} Found</div>
-        <div><pre className={style.pre}>{JSON.stringify(filters, null, 2) }</pre></div>
-        <div><pre className={style.pre}>{this.state.selectedParam}</pre></div>
+        <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div>
       </div>
     );
   }

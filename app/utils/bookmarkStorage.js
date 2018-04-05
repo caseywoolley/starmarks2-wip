@@ -135,6 +135,5 @@ const loadState = async () => {
   const bookmarkTree = await getBookmarkTree();
   const bookmarkHash = treeToHash(bookmarkTree);
   const state = await bookmarkHashToState(bookmarkHash);
-  debugger
   return state;
 };

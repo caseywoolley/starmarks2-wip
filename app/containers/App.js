@@ -22,15 +22,26 @@ const containsString = (str, testStr) => _.includes(str.toLowerCase(), testStr.t
 //     ? containsString(field, str) : findNestedString(field)));
 // };
 
-const filterStarmarks = (starmarks, filters) => {
-  let results = _.sortBy(_.toArray(starmarks), filters.sortBy);
-  const query = _.get(filters, 'query', '').trim();
+//full search
+// field search
+// array search (tags)
+// range search (dates, ratings)
+const filterStarmarks = (starmarks, search) => {
+  let results = _.sortBy(_.toArray(starmarks), search.sortBy);
+  const query = _.get(search, 'query', '').trim();
+  if ((search.params || []).length) {
+    _.forEach(search.params, (param) => {
+      if (param.name === 'rating') {
+        //filter ratings
+      }
+    });
+  }
   if (query) {
     results = _.filter(results, result => _.some(result, field => (_.isString(field)
         ? containsString(field, query)
         : _.some(field, val => containsString(val, query)))));
   }
-  return filters.reverse ? results.reverse() : results;
+  return search.reverse ? results.reverse() : results;
   //.filter((starmark) => {
   //   return true //_.find(starmark.tags, tag => tag.title.includes(search));
   // });
@@ -41,7 +52,7 @@ const filterStarmarks = (starmarks, filters) => {
   state => ({
     starmarks: state.starmarks,
     tags: state.tags,
-    filters: state.filters
+    search: state.search
   }),
   dispatch => ({
     actions: bindActionCreators(TodoActions, dispatch)
@@ -93,16 +104,16 @@ export default class App extends Component {
   }
 
   render() {
-    const { starmarks, tags, filters, actions } = this.props;
+    const { starmarks, tags, search, actions } = this.props;
     const { isEditing } = this.state;
-    const starmark = starmarks[activeTab.url] || activeTab;
-    const results = filterStarmarks(starmarks, filters);
+    const starmark = activeTab ? starmarks[activeTab.url] : activeTab;
+    const results = filterStarmarks(starmarks, search);
     return (
       <div >
         { !isPopup &&
           <div className={style.container}>
-            <SearchBar addFilters={actions.addFilters} filters={filters} foundCount={results.length} />
-            <StarList results={results} starmarks={starmarks} tags={tags} filters={filters} actions={actions} />
+            <SearchBar updateSearch={actions.updateSearch} search={search} foundCount={results.length} />
+            <StarList results={results} starmarks={starmarks} tags={tags} search={search} actions={actions} />
           </div>
         }
         { isPopup &&

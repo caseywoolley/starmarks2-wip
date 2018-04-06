@@ -6,15 +6,27 @@ import * as TodoActions from '../actions/todos';
 import style from './SearchBar.css';
 
 
-const searchFilters = [
-  { key: 'stars', name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
-  { key: 'visits', name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
-  { key: 'dateAdded', name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-  { key: 'lastVisit', name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-  { key: 'tags', name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
-  { key: 'title', name: 'Title', placeholder: 'Title...' },
-  { key: 'url', name: 'Url', placeholder: 'Url...' }
-];
+// const searchFilters = [
+//   { key: 'stars', name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
+//   { key: 'visits', name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
+//   { key: 'dateAdded', name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+//   { key: 'lastVisit', name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+//   { key: 'tags', name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
+//   { key: 'title', name: 'Title', placeholder: 'Title...' },
+//   { key: 'url', name: 'Url', placeholder: 'Url...' }
+// ];
+
+const searchFilters = {
+  stars: { name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
+  visits: { name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
+  dateAdded: { name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+  lastVisit: { name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+  tags: { name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
+  title: { name: 'Title', placeholder: 'Title...' },
+  url: { name: 'Url', placeholder: 'Url...' }
+};
+
+let selectedKey;
 
 const keyCodes = {
   tab: 9,
@@ -44,20 +56,22 @@ export default class SearchBar extends Component {
   addNewFilter = (e) => {
     const { resetQuery, addFilter } = this.props.actions;
     e.preventDefault();
-    const filterName = e.target.value.trim();
+    const filterKey = e.target.value.trim().toLowerCase();
     resetQuery();
-    if (filterName !== '') {
-      addFilter(filterName);
+    if (searchFilters[filterKey]) {
+      selectedKey = filterKey;
+      addFilter({ [filterKey]: searchFilters[filterKey] });
     }
-    this.getCurrentInput().focus();
+    // this.getCurrentInput().focus();
+    this.searchInput.focus();
   }
 
   selectLastFilterInput = (e) => {
     const { search } = this.props;
     if (search.query === '') {
       e.preventDefault();
-      // this.getCurrentInput().focus();
-      this.lastFilterInput.focus();
+      this.getCurrentInput().focus();
+      // this.lastFilterInput.focus();
     }
   }
 
@@ -112,9 +126,9 @@ export default class SearchBar extends Component {
     }
   }
 
-  handleRemoveFilter = (index) => {
+  handleRemoveFilter = (key) => {
     const { removeFilter } = this.props.actions;
-    removeFilter(index);
+    removeFilter(key);
     this.searchInput.focus();
   }
 
@@ -122,20 +136,20 @@ export default class SearchBar extends Component {
 
   }
 
-  setFilterValue = (e, i) => {
+  setFilterValue = (e, key) => {
     const { search, updateSearch } = this.props;
     const { updateFilter } = this.props.actions;
     const value = e.target.value.trim();
-    const updatedFilter = { ...search.filters[i], value };
-    updateFilter(updatedFilter, i);
+    const updatedFilter = { ...search.filters[key], value };
+    updateFilter({ [key]: updatedFilter });
     // updateSearch({
     //   filters: [...search.filters.slice(0, i), updatedFilter, ...search.filters.slice(i + 1)]
     // });
   }
 
-  setLastFilterInput = (input, i) => {
-    const filtersLength = _.get(this, 'props.search.filters', []).length;
-    this.lastFilterInput = (i === filtersLength - 1) ? input : null;
+  setLastFilterInput = (input, key) => {
+    // const filtersLength = _.get(this, 'props.search.filters', []).length;
+    this.lastFilterInput = input; //(key === selectedKey) ? input : null;
   };
 
   render() {
@@ -143,20 +157,21 @@ export default class SearchBar extends Component {
     return (
       <div className={style.searchContainer}>
         <div className={style.searchBar}>
-          {(search.filters || []).map((filter, i) =>
-            <li key={i} className={style.filters} onClick={() => this.handleClickFilter(i)}>
+          {_.map((search.filters || {}), (filter, key) =>
+            <li key={key} className={style.filters} onClick={() => this.handleClickFilter(key)}>
               <span>{filter.name}</span>
               <input
                 type="text"
-                ref={input => this.setLastFilterInput(input, i)}
+                ref={input => this.setLastFilterInput(input, key)}
                 onClick={(e) => { e.stopPropagation(); }}
                 autoFocus="true"
                 onFocus={this.handleFocus}
-                onChange={e => this.setFilterValue(e, i)}
-                onKeyDown={e => this.handleFilterKeyDown(e, i)}
+                onChange={e => this.setFilterValue(e, key)}
+                onKeyDown={e => this.handleFilterKeyDown(e, key)}
+                placeholder={filter.placeholder}
                 value={filter.value}
               />
-              <span onClick={() => this.handleRemoveFilter(i)}>x</span>
+              <span onClick={() => this.handleRemoveFilter(key)}>x</span>
             </li>
           )}
           <input

@@ -15,14 +15,23 @@
   outline: none;
 }
 
-.searchBar > input {
-  font-size: 16px;
+.searchBox {
   width: 100%;
+  font-size: 20px;
+ }
+
+ .searchBox input {
+  font-size: inherit;
   outline: none;
   border: none;
  }
 
- .filters {
+.filterOptions {
+  position: absolute;
+  background: white;
+}
+
+.filters {
   font-size: 14px;
   background-color: lightblue;
   color: blue;

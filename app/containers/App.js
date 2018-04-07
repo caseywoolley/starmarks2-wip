@@ -26,6 +26,9 @@ const containsString = (str, testStr) => _.includes(str.toLowerCase(), testStr.t
 // field search
 // array search (tags)
 // range search (dates, ratings)
+const strToRange = str => str.split(/[ -]+/);
+const filterRange = (arr, field, range) => _.filter(arr, item => _.inRange(item[field], range.min, range.max));
+
 const filterStarmarks = (starmarks, search) => {
   let results = _.sortBy(_.toArray(starmarks), search.sortBy);
   const query = _.get(search, 'query', '').trim();

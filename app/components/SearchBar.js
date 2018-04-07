@@ -1,30 +1,46 @@
 import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import Fuse from 'fuse.js';
 import _ from 'lodash';
 import * as TodoActions from '../actions/todos';
 import style from './SearchBar.css';
 
-
-// const searchFilters = [
-//   { key: 'stars', name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
-//   { key: 'visits', name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
-//   { key: 'dateAdded', name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-//   { key: 'lastVisit', name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-//   { key: 'tags', name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
-//   { key: 'title', name: 'Title', placeholder: 'Title...' },
-//   { key: 'url', name: 'Url', placeholder: 'Url...' }
-// ];
-
-const searchFilters = {
-  stars: { name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
-  visits: { name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
-  dateAdded: { name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-  lastVisit: { name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-  tags: { name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
-  title: { name: 'Title', placeholder: 'Title...' },
-  url: { name: 'Url', placeholder: 'Url...' }
+const options = {
+  shouldSort: true,
+  threshold: 0.3,
+  location: 0,
+  distance: 100,
+  maxPatternLength: 32,
+  minMatchCharLength: 1,
+  keys: [
+    'name'
+  ]
 };
+
+const searchFiltersArr = [
+  { key: 'stars', name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
+  { key: 'visits', name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
+  { key: 'dateAdded', name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+  { key: 'lastVisit', name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+  { key: 'tags', name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
+  { key: 'title', name: 'Title', placeholder: 'Title...' },
+  { key: 'url', name: 'Url', placeholder: 'Url...' }
+];
+
+const getFilter = _.memoize(key => searchFiltersArr.filter(filter => filter.key === key)[0]);
+
+// const searchFilters = {
+//   stars: { name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
+//   visits: { name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
+//   dateAdded: { name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+//   lastVisit: { name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
+//   tags: { name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
+//   title: { name: 'Title', placeholder: 'Title...' },
+//   url: { name: 'Url', placeholder: 'Url...' }
+// };
+
+const allFilters = new Fuse(searchFiltersArr, options);
 
 let selectedKey;
 
@@ -51,16 +67,19 @@ export default class SearchBar extends Component {
   };
 
   getCurrentInput = () => (this.lastFilterInput ? this.lastFilterInput : this.searchInput);
-  filterIsEmpty = index => !this.props.search.filters[index].value;
+  filterIsEmpty = index => !this.props.search.filters[index];
+  // getSelectedFilter = query => allFilters.search(query)[0];
 
   addNewFilter = (e) => {
     const { resetQuery, addFilter } = this.props.actions;
+    const { search } = this.props;
     e.preventDefault();
     const filterKey = e.target.value.trim().toLowerCase();
     resetQuery();
-    if (searchFilters[filterKey]) {
-      selectedKey = filterKey;
-      addFilter({ [filterKey]: searchFilters[filterKey] });
+    const selectedFilter = allFilters.search(search.query)[0];
+    if (selectedFilter) {
+      selectedKey = selectedFilter.key;
+      addFilter({ [selectedKey]: '' });
     }
     // this.getCurrentInput().focus();
     this.searchInput.focus();
@@ -141,7 +160,7 @@ export default class SearchBar extends Component {
     const { updateFilter } = this.props.actions;
     const value = e.target.value.trim();
     const updatedFilter = { ...search.filters[key], value };
-    updateFilter({ [key]: updatedFilter });
+    updateFilter({ [key]: value });
     // updateSearch({
     //   filters: [...search.filters.slice(0, i), updatedFilter, ...search.filters.slice(i + 1)]
     // });
@@ -157,9 +176,9 @@ export default class SearchBar extends Component {
     return (
       <div className={style.searchContainer}>
         <div className={style.searchBar}>
-          {_.map((search.filters || {}), (filter, key) =>
+          {_.map((search.filters || {}), (val, key) =>
             <li key={key} className={style.filters} onClick={() => this.handleClickFilter(key)}>
-              <span>{filter.name}</span>
+              <span>{getFilter(key).name}</span>
               <input
                 type="text"
                 ref={input => this.setLastFilterInput(input, key)}
@@ -168,23 +187,32 @@ export default class SearchBar extends Component {
                 onFocus={this.handleFocus}
                 onChange={e => this.setFilterValue(e, key)}
                 onKeyDown={e => this.handleFilterKeyDown(e, key)}
-                placeholder={filter.placeholder}
-                value={filter.value}
+                placeholder={getFilter(key).placeholder}
+                value={getFilter(key).value}
               />
               <span onClick={() => this.handleRemoveFilter(key)}>x</span>
+
             </li>
           )}
-          <input
-            type="text"
-            ref={(input) => { this.searchInput = input; }}
-            onChange={this.handleChange}
-            onKeyDown={this.handleSearchKeyDown}
-            onFocus={this.handleFocus}
-            value={search.query}
-          />
+          <div className={style.searchBox}>
+            <input
+              type="text"
+              ref={(input) => { this.searchInput = input; }}
+              onChange={this.handleChange}
+              onKeyDown={this.handleSearchKeyDown}
+              onFocus={this.handleFocus}
+              value={search.query}
+            />
+            <div className={style.filterOptions}>
+              {_.map(allFilters.search(search.query), result =>
+                <div key={result.key}>{result.name}</div>
+              )}
+            </div>
+          </div>
         </div>
         <div className={style.foundCount}>{foundCount} Found</div>
         <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div>
+        <div><pre className={style.pre}>{JSON.stringify(allFilters.search(search.query), null, 2) }</pre></div>
       </div>
     );
   }

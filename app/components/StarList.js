@@ -7,11 +7,13 @@ import Starmark from './Starmark';
 import style from './StarList.css';
 import starmarkStyle from './Starmark.css';
 
+const parseUrl = url => new URL(url);
 export default class StarList extends Component {
 
   static propTypes = {
     // addStarmark: PropTypes.func.isRequired,
-    starmarks: PropTypes.object.isRequired
+    starmarks: PropTypes.object.isRequired,
+    results: PropTypes.array.isRequired
   };
 
   constructor(props) {
@@ -20,6 +22,14 @@ export default class StarList extends Component {
       displayLimit: 30,
       search: ''
     };
+  }
+
+  componentWillUpdate(nextProps) {
+    if (nextProps.results !== this.props.results) {
+      this.setState({
+        displayLimit: 30
+      });
+    }
   }
 
   loadMore = () => {
@@ -35,7 +45,7 @@ export default class StarList extends Component {
     console.log(update)
     this.setState({
       search: update.title,
-      displayLimit: 30
+      // displayLimit: 30
     });
   }
 
@@ -52,13 +62,13 @@ export default class StarList extends Component {
   }
 
   render() {
-    const { tags, results } = this.props;
+    const { tags, results, actions } = this.props;
     const { displayLimit } = this.state;
     // const results = filterStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         <div className={[starmarkStyle.row, style.heading].join(' ')}>
-          <span className={starmarkStyle.favicon} />
+          <span className={starmarkStyle.favicon} onClick={() => this.updateSort({ sortBy: 'title' })}>v</span>
           <span className={starmarkStyle.title} onClick={() => this.updateSort({ sortBy: 'title' })}>Title</span>
           <span className={starmarkStyle.rating} onClick={() => this.updateSort({ sortBy: 'rating' })}>Rating</span>
           <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'dateAdded' })}>Added</span>
@@ -68,7 +78,7 @@ export default class StarList extends Component {
         <div className={style.list}>
           {_.map(results.slice(0, displayLimit), (starmark, i) => (
             <div key={starmark.url} className={classnames({ [style.oddRow]: !(i % 2) })}>
-              <Starmark starmark={starmark} tags={tags} updateSearch={this.updateSearch} />
+              <Starmark starmark={starmark} tags={tags} actions={actions} />
             </div>
           ))}
           <Waypoint key={displayLimit} onEnter={this.loadMore} />

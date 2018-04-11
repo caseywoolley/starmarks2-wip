@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import fuzy from '../utils/fuzySearch';
+import searchResults from '../utils/searchResults';
 import * as TodoActions from '../actions/todos';
 
 import StarmarkTextInput from '../components/StarmarkTextInput';
@@ -15,41 +17,6 @@ let activeTab;
 chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
   activeTab = tabs[0];
 });
-
-const containsString = (str, testStr) => _.includes(str.toLowerCase(), testStr.toLowerCase());
-// const findNestedString = (node, str) => {
-//   return _.some(node, field => (_.isString(field)
-//     ? containsString(field, str) : findNestedString(field)));
-// };
-
-//full search
-// field search
-// array search (tags)
-// range search (dates, ratings)
-const strToRange = str => str.split(/[ -]+/);
-const filterRange = (arr, field, range) => _.filter(arr, item => _.inRange(item[field], range.min, range.max));
-
-const filterStarmarks = (starmarks, search) => {
-  let results = _.sortBy(_.toArray(starmarks), search.sortBy);
-  const query = _.get(search, 'query', '').trim();
-  if ((search.params || []).length) {
-    _.forEach(search.params, (param) => {
-      if (param.name === 'rating') {
-        //filter ratings
-      }
-    });
-  }
-  if (query) {
-    results = _.filter(results, result => _.some(result, field => (_.isString(field)
-        ? containsString(field, query)
-        : _.some(field, val => containsString(val, query)))));
-  }
-  return search.reverse ? results.reverse() : results;
-  //.filter((starmark) => {
-  //   return true //_.find(starmark.tags, tag => tag.title.includes(search));
-  // });
-};
-
 
 @connect(
   state => ({
@@ -110,7 +77,7 @@ export default class App extends Component {
     const { starmarks, tags, search, actions } = this.props;
     const { isEditing } = this.state;
     const starmark = activeTab ? starmarks[activeTab.url] : activeTab;
-    const results = filterStarmarks(starmarks, search);
+    const results = searchResults(starmarks, tags, search);
     return (
       <div >
         { !isPopup &&

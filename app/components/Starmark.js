@@ -25,7 +25,8 @@ export default class Starmark extends Component {
   }
 
   render() {
-    const { starmark, tags, updateSearch } = this.props;
+    const { starmark, tags } = this.props;
+    const { addFilter } = this.props.actions;
     return (
       <div className={style.starmark}>
         <div className={style.row}>
@@ -38,7 +39,7 @@ export default class Starmark extends Component {
               </span>
             </div>
             <div className={style.tagRow}>
-              { (starmark.tags || []).map(tagId => <span onClick={() => updateSearch(tagId)} className={style.tag} key={tagId}>{tags[tagId] ? tags[tagId].title : tagId}</span>) }
+              { (starmark.tags || []).map(tag => <span onClick={() => addFilter({ tags: tag.title })} className={style.tag} key={tag.id}>{tag.title}</span>) }
             </div>
           </span>
           <span className={[style.stars, style.rating].join(' ')}>

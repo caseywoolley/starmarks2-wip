@@ -74,6 +74,7 @@ export default class StarList extends Component {
           <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'dateAdded' })}>Added</span>
           <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'lastVisitTime' })}>Visited</span>
           <span className={starmarkStyle.visitCount} onClick={() => this.updateSort({ sortBy: 'visitCount' })}>Visits</span>
+          <span className={starmarkStyle.favicon}></span>
         </div>
         <div className={style.list}>
           {_.map(results.slice(0, displayLimit), (starmark, i) => (

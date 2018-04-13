@@ -48,6 +48,7 @@ export default class Starmark extends Component {
           <span className={style.date}>{timeSince(starmark.dateAdded)}</span>
           <span className={style.date}>{timeSince(starmark.lastVisitTime) }</span>
           <span className={style.visitCount}>{starmark.visitCount || 0}</span>
+          <span className={style.favicon}><i className="fa fa-pencil-square-o" onClick={this.edit} /></span>
         </div>
       </div>
     );

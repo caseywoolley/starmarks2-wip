@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import fuzy from '../utils/fuzySearch';
 import searchResults from '../utils/searchResults';
 import * as TodoActions from '../actions/todos';
 
@@ -17,6 +16,16 @@ let activeTab;
 chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
   activeTab = tabs[0];
 });
+
+let resultCache = [];
+const debouncedSearch = _.throttle(searchResults, 100, { leading: true, trailing: false });
+const debouncedResults = (starmarks, tags, search) => {
+  const results = debouncedSearch(starmarks, tags, search);
+  if (results) {
+    resultCache = results;
+  }
+  return results || resultCache;
+};
 
 @connect(
   state => ({
@@ -40,6 +49,7 @@ export default class App extends Component {
     this.state = {
       isEditing: false
     };
+    this.resultCache = [];
   }
 
   componentDidMount() {
@@ -73,11 +83,13 @@ export default class App extends Component {
     chrome.tabs.create({ url: 'window.html' });
   }
 
+
+
   render() {
     const { starmarks, tags, search, actions } = this.props;
     const { isEditing } = this.state;
     const starmark = activeTab ? starmarks[activeTab.url] : activeTab;
-    const results = searchResults(starmarks, tags, search);
+    const results = debouncedResults(starmarks, tags, search);
     return (
       <div >
         { !isPopup &&

@@ -2,36 +2,9 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import fuzySearch from '../utils/fuzySearch';
-import searchResults, { findMatch } from '../utils/searchResults';
+import { searchFilters, getFilter } from '../utils/searchResults';
 import * as TodoActions from '../actions/todos';
 import style from './SearchBar.css';
-
-const searchFiltersArr = [
-  { key: 'stars', name: 'Rating', placeholder: 'ex 5, 2-4, 3+', isRange: true },
-  { key: 'visits', name: 'Visits', placeholder: 'ex 1-5, 20+, 2', isRange: true },
-  { key: 'dateAdded', name: 'Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15', isRange: true, isDate: true },
-  { key: 'lastVisit', name: 'Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15', isRange: true, isDate: true },
-  { key: 'tags', name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
-  { key: 'title', name: 'Title', placeholder: 'Title...' },
-  { key: 'url', name: 'Url', placeholder: 'Url...' }
-];
-
-const getFilter = _.memoize(key => searchFiltersArr.filter(filter => filter.key === key)[0]);
-
-// const searchFilters = {
-//   stars: { name: 'Rating', placeholder: 'ex 5, 2-4, 3+' },
-//   visits: { name: 'Visits', placeholder: 'ex 1-5, 20+, 2' },
-//   dateAdded: { name: 'Date Added', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-//   lastVisit: { name: 'Last Visited', placeholder: 'ex 2012+, 1/16/15 - 5/18/15' },
-//   tags: { name: 'Tags', suggestedValues: [], placeholder: 'ex tag1, tag2 ...' },
-//   title: { name: 'Title', placeholder: 'Title...' },
-//   url: { name: 'Url', placeholder: 'Url...' }
-// };
-
-const fuzyFilters = fuzySearch(searchFiltersArr, { keys: ['name'] });
-const searchFilters = (filterName) => findMatch(searchFiltersArr, filterName, ['name']);
-let selectedKey;
 
 const keyCodes = {
   tab: 9,
@@ -57,20 +30,16 @@ export default class SearchBar extends Component {
 
   getCurrentInput = () => (this.lastFilterInput ? this.lastFilterInput : this.searchInput);
   filterIsEmpty = index => !this.props.search.filters[index];
-  // getSelectedFilter = query => fuzyFilters.search(query)[0];
 
   addNewFilter = (e) => {
     const { resetQuery, addFilter } = this.props.actions;
     const { search } = this.props;
     e.preventDefault();
-    const filterKey = e.target.value.trim().toLowerCase();
     resetQuery();
     const selectedFilter = searchFilters(search.query)[0];
     if (selectedFilter) {
-      selectedKey = selectedFilter.key;
-      addFilter({ [selectedKey]: '' });
+      addFilter({ [selectedFilter.key]: '' });
     }
-    // this.getCurrentInput().focus();
     this.searchInput.focus();
   }
 
@@ -79,7 +48,6 @@ export default class SearchBar extends Component {
     if (search.query === '') {
       e.preventDefault();
       this.getCurrentInput().focus();
-      // this.lastFilterInput.focus();
     }
   }
 
@@ -110,10 +78,11 @@ export default class SearchBar extends Component {
 
   componentDidMount() {
     this.searchInput.focus();
+    // this.debouncedUpdate = _.debounce(this.props.actions.updateSearch, 50);
   }
 
   handleChange = (e) => {
-    this.props.updateSearch({ query: e.target.value });
+    this.props.actions.updateSearch({ query: e.target.value });
   }
 
   handleFocus = (event) => {
@@ -145,19 +114,13 @@ export default class SearchBar extends Component {
   }
 
   setFilterValue = (e, key) => {
-    const { search, updateSearch } = this.props;
     const { updateFilter } = this.props.actions;
     const value = e.target.value;
-    const updatedFilter = { ...search.filters[key], value };
     updateFilter({ [key]: value });
-    // updateSearch({
-    //   filters: [...search.filters.slice(0, i), updatedFilter, ...search.filters.slice(i + 1)]
-    // });
   }
 
-  setLastFilterInput = (input, key) => {
-    // const filtersLength = _.get(this, 'props.search.filters', []).length;
-    this.lastFilterInput = input; //(key === selectedKey) ? input : null;
+  setLastFilterInput = (input) => {
+    this.lastFilterInput = input;
   };
 
   render() {
@@ -202,7 +165,7 @@ export default class SearchBar extends Component {
         </div>
         <div className={style.foundCount}>{foundCount} Found</div>
         <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div>
-        <div><pre className={style.pre}>{JSON.stringify(fuzyFilters.search(search.query), null, 2) }</pre></div>
+        <div><pre className={style.pre}>{JSON.stringify(searchFilters(search.query), null, 2) }</pre></div>
       </div>
     );
   }

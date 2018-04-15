@@ -49,7 +49,6 @@ export default class App extends Component {
     this.state = {
       isEditing: false
     };
-    this.resultCache = [];
   }
 
   componentDidMount() {

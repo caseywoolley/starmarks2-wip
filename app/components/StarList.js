@@ -26,6 +26,7 @@ export default class StarList extends Component {
 
   componentWillUpdate(nextProps) {
     if (nextProps.results !== this.props.results) {
+      window.scrollTo(0, 0);
       this.setState({
         displayLimit: 30
       });
@@ -68,7 +69,7 @@ export default class StarList extends Component {
     return (
       <div className={style.starlist}>
         <div className={[starmarkStyle.row, style.heading].join(' ')}>
-          <span className={starmarkStyle.favicon} onClick={() => this.updateSort({ sortBy: 'title' })}>v</span>
+          <span className={starmarkStyle.favicon} onClick={() => this.updateSort({ sortBy: 'url' })}>v</span>
           <span className={starmarkStyle.title} onClick={() => this.updateSort({ sortBy: 'title' })}>Title</span>
           <span className={starmarkStyle.rating} onClick={() => this.updateSort({ sortBy: 'rating' })}>Rating</span>
           <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'dateAdded' })}>Added</span>

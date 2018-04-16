@@ -1,7 +1,9 @@
 .starlist {
+  flex: 1;
   padding-top: 350px;
-  width: 80%;
-  min-width: 800px;
+  padding-right: 300px;
+  /* width: 80%;
+  min-width: 800px; */
 }
 
 .list > div {

@@ -82,34 +82,37 @@ export default class App extends Component {
     chrome.tabs.create({ url: 'window.html' });
   }
 
-
-
   render() {
     const { starmarks, tags, search, actions } = this.props;
     const { isEditing } = this.state;
-    const starmark = activeTab ? starmarks[activeTab.url] : activeTab;
+    const starmark = {} //activeTab ? starmarks[activeTab.url] || {}: activeTab;
     const results = debouncedResults(starmarks, tags, search);
+    // const starmark = results[0];
     return (
       <div >
         { !isPopup &&
           <div className={style.container}>
             <SearchBar updateSearch={actions.updateSearch} search={search} foundCount={results.length} />
-            <StarList results={results} starmarks={starmarks} tags={tags} search={search} actions={actions} />
+            <div className={style.main}>
+              {/* <div className={style.tagsSpacer} /> */}
+              <StarList results={results} starmarks={starmarks} tags={tags} search={search} actions={actions} />
+
+            </div>
           </div>
         }
-        { isPopup &&
-          <div className={style.popup}>
-            <div className={style.stars}><StarSelector
-              starmark={{ title: starmark.title, rating: starmark.rating, url: activeTab.url }}
-              addStarmark={actions.addStarmark}
-            /></div>
-            { !isEditing
-                ? <div onDoubleClick={() => this.setState({ isEditing: true })}>{starmark.title}</div>
-                : <StarmarkTextInput text={starmark.title} onSave={this.onSave} />
-            }
-            <div>{activeTab.url}</div>
-            <button onClick={this.seeStars}>Explore Starmarks</button>
-          </div>
+        { //isPopup &&
+          // <div className={style.popup}>
+          //   <div className={style.stars}><StarSelector
+          //     starmark={{ title: starmark.title, rating: starmark.rating, url: activeTab.url }}
+          //     addStarmark={actions.addStarmark}
+          //   /></div>
+          //   { !isEditing
+          //       ? <div onDoubleClick={() => this.setState({ isEditing: true })}>{starmark.title}</div>
+          //       : <StarmarkTextInput text={starmark.title} onSave={this.onSave} />
+          //   }
+          //   <div>{activeTab.url}</div>
+          //   <button onClick={this.seeStars}>Explore Starmarks</button>
+          // </div>
         }
       </div>
     );

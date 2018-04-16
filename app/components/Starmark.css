@@ -5,10 +5,18 @@
 }
 
 .row {
-  white-space: nowrap;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* display: -webkit-box;
+  line-height: 16px;
+  max-height: 32px;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; */
+  /* white-space: nowrap; */
   display: flex;
   justify-content: space-between;
-  flex-wrap: nowrap;
+  /* flex-wrap: nowrap; */
 }
 
 .row > span {

@@ -1,7 +1,7 @@
 import * as ActionTypes from '../constants/ActionTypes';
 import * as StarmarkFilters from '../constants/StarmarkFilters';
 
-const initialState = { sortBy: 'dateAdded', reverse: true };
+const initialState = { sortBy: 'dateAdded', reverse: true, filters: {} };
 
 const actionsMap = {
   [ActionTypes.UPDATE_SEARCH](state, { updates }) {

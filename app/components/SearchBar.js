@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import Popup from './Popup';
 import { searchFilters, getFilter } from '../utils/searchResults';
 import * as TodoActions from '../actions/todos';
 import style from './SearchBar.css';
@@ -13,7 +14,8 @@ const keyCodes = {
 
 @connect(
   state => ({
-    search: state.search
+    search: state.search,
+    starmarks: state.starmarks
   }),
   dispatch => ({
     actions: bindActionCreators(TodoActions, dispatch)
@@ -125,6 +127,8 @@ export default class SearchBar extends Component {
 
   render() {
     const { foundCount, search } = this.props;
+    // const key = Object.keys(this.state.starmarks)[0];
+    // const starmark = this.state.starmarks[key];
     return (
       <div className={style.fixedHeader}>
         <div className={style.searchContainer}>
@@ -168,9 +172,10 @@ export default class SearchBar extends Component {
               </div>
             </div>
           </div>
-            <div className={style.foundCount}>{foundCount} Found</div>
-            <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div>
-            <div><pre className={style.pre}>{JSON.stringify(searchFilters(search.query), null, 2) }</pre></div>
+          <div className={style.foundCount}>{foundCount} Found</div>
+          <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div>
+          <div><pre className={style.pre}>{JSON.stringify(searchFilters(search.query), null, 2) }</pre></div>
+          {/* <Popup starmark={starmark} /> */}
         </div>
       </div>
     );

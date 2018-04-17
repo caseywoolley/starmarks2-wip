@@ -6,7 +6,8 @@
   min-width: 800px; */
 }
 
-.list > div {
+.list > td {
+  cursor: pointer;
   border-top: 1px solid rgb(235, 235, 235);
 }
 
@@ -20,4 +21,45 @@
 
 .oddRow {
   background: #f9f9f9;
+}
+
+.selectableTable {
+  width: 100%
+}
+
+/* .selected {
+  background: #ebf4fb;
+} */
+
+/* Cells that can be interacted with */
+:global(.table-drag-select) :global(td.cell-enabled) {
+
+}
+
+/* Cells that cannot be interacted with */
+.table-drag-select td.cell-disabled {
+  /* Put yer css here */
+}
+
+/* Cells that have been selected */
+.selectableTable :global(td.cell-selected) {
+  background-color: #fbead7;
+}
+
+/* Cells that are in the process of being selected */
+.selectableTable :global(td.cell-being-selected) {
+  background-color: #ffdebb;
+}
+
+/* Cells in first row */
+.selectableTable :global(tr:first-child) td {
+  /* Remove empty space at top of table */
+  border-top: 0;
+  line-height: 1rem;
+}
+
+/* Cells in first column */
+.table-drag-select td:first-child {
+  /* Consume less whitespace */
+  width: 3rem;
 }

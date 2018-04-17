@@ -14,7 +14,7 @@ import style from './App.css';
 const isPopup = window.location.pathname === '/popup.html';
 let activeTab;
 chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-  activeTab = tabs[0];
+  // activeTab = tabs[0];
 });
 
 let resultCache = [];

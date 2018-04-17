@@ -102,9 +102,9 @@ span.url {
   font-size: 20px;
   color: #909090;
 }
-.row:hover {
+/* .row:hover {
   background: #ebf4fb;
-}
+} */
 
 .row:hover .editIcon {
   visibility: visible;

@@ -11,7 +11,10 @@ import style from './StarList.css';
 import starmarkStyle from './Starmark.css';
 const LIMIT = 30;
 const parseUrl = url => new URL(url);
-const getCellsArray = num => _.times(num, () => { return [false] })
+const getCellsArray = num => _.times(num, () => { return [false] });
+const getSelected = (results, cells) => _.filter(results, (result, i) => cells[i] && cells[i][0]);
+const resultsHaveChanged = (results, newResults) => _.get(results[0], 'title') !== _.get(newResults[0], 'title') || results.length !== newResults.length;
+
 export default class StarList extends Component {
 
   static propTypes = {
@@ -30,10 +33,11 @@ export default class StarList extends Component {
   }
 
   componentWillUpdate(nextProps) {
-    const { results } = this.props;
-    if (nextProps.results !== results) {
+    const { results, setSelection } = this.props;
+    if (resultsHaveChanged(results, nextProps.results)) {
       const count = Math.min(nextProps.results.length, LIMIT);
       window.scrollTo(0, 0);
+
       this.setState({
         displayLimit: count,
         cells: getCellsArray(count)
@@ -72,28 +76,20 @@ export default class StarList extends Component {
   }
 
   updateSelection = (cells) => {
-    const { results } = this.props;
-    const selected = _.filter(results, (result, i) => cells[i] && cells[i][0]);
-    this.setState({ cells, selected });
+    const { results, setSelection } = this.props;
+    const selected = getSelected(results, cells);
+    setSelection(selected);
     console.log(selected)
+    this.setState({ cells, selected });
   }
 
   render() {
-    const { tags, results, actions } = this.props;
+    const { tags, results, actions, setSelection } = this.props;
     const { displayLimit, cells } = this.state;
     const limitedResults = results.slice(0, displayLimit);
     // const results = filterStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
-        <div className={[starmarkStyle.row, style.heading].join(' ')}>
-          <span className={starmarkStyle.favicon} onClick={() => this.updateSort({ sortBy: 'url' })}>v</span>
-          <span className={starmarkStyle.title} onClick={() => this.updateSort({ sortBy: 'title' })}>Title</span>
-          <span className={starmarkStyle.rating} onClick={() => this.updateSort({ sortBy: 'rating' })}>Rating</span>
-          <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'dateAdded' })}>Added</span>
-          <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'lastVisitTime' })}>Visited</span>
-          <span className={starmarkStyle.visitCount} onClick={() => this.updateSort({ sortBy: 'visitCount' })}>Visits</span>
-          <span className={starmarkStyle.favicon} />
-        </div>
         <TableDragSelect
           className={style.selectableTable}
           value={this.state.cells}

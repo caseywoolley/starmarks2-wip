@@ -1,0 +1,20 @@
+.fixedContainer {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 0px;
+  bottom: 0px;
+  right: 0px;
+  width: calc(10% + 300px);
+  background: white;
+  z-index: 1;
+}
+
+.popup {
+  padding-top: 110px;
+  padding-left: 20px;
+  width: 280px;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

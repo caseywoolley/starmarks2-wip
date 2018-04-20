@@ -2,10 +2,11 @@
   color: #555555;
   font-size: 14px;
   font-weight: 400;
+  cursor: pointer;
 }
 
 .row {
-  word-break: break-all;
+  word-wrap: break-word;
   overflow: hidden;
   text-overflow: ellipsis;
   /* display: -webkit-box;

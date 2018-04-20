@@ -42,15 +42,23 @@ export default class StarmarkTextInput extends Component {
     // }
   };
 
+  // handleInput = (e) => {
+  //   debugger
+  //   const textArea = e.target;
+  //   textArea.rows = Math.ceil(textArea.value.length / 20);
+  // };
+
   render() {
     return (
-      <input
+      <textarea
         className={style.edit}
+        // onInput={this.handleInput}
         // className={classnames({
         //   [style.edit]: this.props.editing,
         //   [style.new]: this.props.newTodo
         // })}
         type="text"
+        rows={Math.ceil(this.state.text.length / 20)}
         placeholder={this.props.placeholder}
         autoFocus="true"
         value={this.state.text}

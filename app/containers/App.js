@@ -8,6 +8,7 @@ import * as TodoActions from '../actions/todos';
 import StarmarkTextInput from '../components/StarmarkTextInput';
 import StarSelector from '../components/StarSelector';
 import SearchBar from '../components/SearchBar';
+import SideBar from '../components/SideBar';
 import StarList from '../components/StarList';
 import style from './App.css';
 
@@ -47,7 +48,8 @@ export default class App extends Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      isEditing: false
+      isEditing: false,
+      selection: []
     };
   }
 
@@ -82,9 +84,13 @@ export default class App extends Component {
     chrome.tabs.create({ url: 'window.html' });
   }
 
+  setSelection = (selection) => {
+    this.setState({ selection });
+  }
+
   render() {
     const { starmarks, tags, search, actions } = this.props;
-    const { isEditing } = this.state;
+    const { isEditing, selection } = this.state;
     const starmark = {} //activeTab ? starmarks[activeTab.url] || {}: activeTab;
     const results = debouncedResults(starmarks, tags, search);
     // const starmark = results[0];
@@ -92,10 +98,11 @@ export default class App extends Component {
       <div >
         { !isPopup &&
           <div className={style.container}>
-            <SearchBar updateSearch={actions.updateSearch} search={search} foundCount={results.length} />
+            <SearchBar updateSearch={actions.updateSearch} search={search} foundCount={results.length} selection={selection} />
+            <SideBar selection={selection} />
             <div className={style.main}>
               {/* <div className={style.tagsSpacer} /> */}
-              <StarList results={results} starmarks={starmarks} tags={tags} search={search} actions={actions} />
+              <StarList results={results} starmarks={starmarks} tags={tags} search={search} actions={actions} setSelection={this.setSelection} />
 
             </div>
           </div>

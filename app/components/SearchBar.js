@@ -2,10 +2,11 @@ import React, { Component, PropTypes } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import Popup from './Popup';
+import Editor from './Editor';
 import { searchFilters, getFilter } from '../utils/searchResults';
 import * as TodoActions from '../actions/todos';
 import style from './SearchBar.css';
+import starmarkStyle from './Starmark.css';
 
 const keyCodes = {
   tab: 9,
@@ -125,57 +126,89 @@ export default class SearchBar extends Component {
     this.lastFilterInput = input;
   };
 
+  updateSort = (newSort) => {
+    const { search } = this.props;
+    const { updateSearch } = this.props.actions;
+
+    const update = { ...newSort };
+    update.reverse = !search.reverse;
+    if (update.sortBy !== search.sortBy) {
+      update.reverse = true;
+    }
+    updateSearch(update);
+  }
+
   render() {
-    const { foundCount, search } = this.props;
+    const { foundCount, search, selection, actions } = this.props;
     // const key = Object.keys(this.state.starmarks)[0];
-    // const starmark = this.state.starmarks[key];
+    const starmark = selection[0];
     return (
       <div className={style.fixedHeader}>
         <div className={style.searchContainer}>
-          <div className={style.searchBar}>
-            <div className={style.searchItems}>
-              <ul className={style.filtersContainer}>
-                {_.map((search.filters || {}), (val, key) =>
-                  <li key={key} className={style.filters} onClick={() => this.handleClickFilter(key)}>
-                    <span>{getFilter(key).name}</span>
-                    <input
-                      type="text"
-                      ref={input => this.setLastFilterInput(input, key)}
-                      onClick={(e) => { e.stopPropagation(); }}
-                      autoFocus="true"
-                      onFocus={this.handleFocus}
-                      onBlur={e => this.removeFilterIfEmpty(e, key)}
-                      onChange={e => this.setFilterValue(e, key)}
-                      onKeyDown={e => this.handleFilterKeyDown(e, key)}
-                      placeholder={getFilter(key).placeholder}
-                      value={search.filters[key]}
-                    />
-                    <span onClick={() => this.handleRemoveFilter(key)}>x</span>
+          <div className={style.opaqueContainer}>
+            <div className={style.searchBar}>
+              <div className={style.searchItems}>
+                <ul className={style.filtersContainer}>
+                  {_.map((search.filters || {}), (val, key) =>
+                    <li key={key} className={style.filters} onClick={() => this.handleClickFilter(key)}>
+                      <span>{getFilter(key).name}</span>
+                      <input
+                        type="text"
+                        ref={input => this.setLastFilterInput(input, key)}
+                        onClick={(e) => { e.stopPropagation(); }}
+                        autoFocus="true"
+                        onFocus={this.handleFocus}
+                        onBlur={e => this.removeFilterIfEmpty(e, key)}
+                        onChange={e => this.setFilterValue(e, key)}
+                        onKeyDown={e => this.handleFilterKeyDown(e, key)}
+                        placeholder={getFilter(key).placeholder}
+                        value={search.filters[key]}
+                      />
+                      <span onClick={() => this.handleRemoveFilter(key)}>x</span>
 
-                  </li>
-                )}
-              </ul>
-              <div className={style.searchBox}>
-                <input
-                  type="text"
-                  ref={(input) => { this.searchInput = input; }}
-                  onChange={this.handleChange}
-                  onKeyDown={this.handleSearchKeyDown}
-                  onFocus={this.handleFocus}
-                  value={search.query}
-                />
-                <div className={style.filterOptions}>
-                  {_.map(searchFilters(search.query), result =>
-                    <div key={result.key}>{result.name}</div>
+                    </li>
                   )}
+                </ul>
+                <div className={style.searchBox}>
+                  <input
+                    type="text"
+                    ref={(input) => { this.searchInput = input; }}
+                    onChange={this.handleChange}
+                    onKeyDown={this.handleSearchKeyDown}
+                    onFocus={this.handleFocus}
+                    value={search.query}
+                  />
+                  <div className={style.filterOptions}>
+                    {_.map(searchFilters(search.query), result =>
+                      <div key={result.key}>{result.name}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={style.sortContainer}>
+              <div className={[starmarkStyle.row, style.heading].join(' ')}>
+                <span className={starmarkStyle.favicon} onClick={() => this.updateSort({ sortBy: 'url' })}>v</span>
+                <span className={starmarkStyle.title} onClick={() => this.updateSort({ sortBy: 'title' })}>Title</span>
+                <span className={starmarkStyle.rating} onClick={() => this.updateSort({ sortBy: 'rating' })}>Rating</span>
+                <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'dateAdded' })}>Added</span>
+                <span className={starmarkStyle.date} onClick={() => this.updateSort({ sortBy: 'lastVisitTime' })}>Visited</span>
+                <span className={starmarkStyle.visitCount} onClick={() => this.updateSort({ sortBy: 'visitCount' })}>Visits</span>
+                <span className={starmarkStyle.favicon} />
+              </div>
+              <div className={style.foundCount}>
+                <div className={style.foundText}>
+                  <span>{foundCount} Found</span>
+                  <span className={style.selectedCount} onClick={() => actions.updateSearch({ selected: !search.selected })}>
+                    { selection.length ? `(${selection.length} Selected)` : ''}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          <div className={style.foundCount}>{foundCount} Found</div>
-          <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div>
-          <div><pre className={style.pre}>{JSON.stringify(searchFilters(search.query), null, 2) }</pre></div>
-          {/* <Popup starmark={starmark} /> */}
+
+          {/* <div><pre className={style.pre}>{JSON.stringify(_.map(selection, sel => sel.title), null, 2) }</pre></div> */}
+          {/* <div><pre className={style.pre}>{JSON.stringify(search, null, 2) }</pre></div> */}
         </div>
       </div>
     );

@@ -7,7 +7,7 @@ import storeOnAction from '../utils/storeOnAction';
 const middlewares = applyMiddleware(thunk, storeOnAction);
 const enhancer = compose(
   middlewares,
-  storage()
+  // storage()
 );
 
 export default function (initialState) {

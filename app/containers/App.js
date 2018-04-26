@@ -61,14 +61,14 @@ export default class App extends Component {
     //       refreshState();
     //     }
     //   });
-    const { addStarmark } = this.props.actions;
-    chrome.runtime.onMessage.addListener(
-      (request, sender, sendResponse) => {
-        if (request.message === 'addStarmark') {
-          addStarmark(request.starmark);
-          sendResponse({ message: 'saved' });
-        }
-      });
+    // const { addStarmark } = this.props.actions;
+    // chrome.runtime.onMessage.addListener(
+    //   (request, sender, sendResponse) => {
+    //     if (request.message === 'addStarmark') {
+    //       addStarmark(request.starmark);
+    //       sendResponse({ message: 'saved' });
+    //     }
+    //   });
   }
 
   onSave = (title) => {
@@ -85,6 +85,8 @@ export default class App extends Component {
   }
 
   setSelection = (selection) => {
+    const { setSelection } = this.props.actions;
+    setSelection(selection);
     this.setState({ selection });
   }
 
@@ -92,18 +94,18 @@ export default class App extends Component {
     const { starmarks, tags, search, actions } = this.props;
     const { isEditing, selection } = this.state;
     const starmark = {} //activeTab ? starmarks[activeTab.url] || {}: activeTab;
-    const results = debouncedResults(starmarks, tags, search);
+    const results = searchResults(starmarks, tags, search);
+    // const results = debouncedResults(starmarks, tags, search);
     // const starmark = results[0];
     return (
       <div >
         { !isPopup &&
           <div className={style.container}>
             <SearchBar updateSearch={actions.updateSearch} search={search} foundCount={results.length} selection={selection} />
-            <SideBar selection={selection} />
+            <SideBar />
             <div className={style.main}>
               {/* <div className={style.tagsSpacer} /> */}
-              <StarList results={results} starmarks={starmarks} tags={tags} search={search} actions={actions} setSelection={this.setSelection} />
-
+              <StarList results={results} tags={tags} search={search} actions={actions} setSelection={this.setSelection} />
             </div>
           </div>
         }

@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import StarSelector from './StarSelector';
 import StarmarkTextInput from './StarmarkTextInput';
 import style from './Editor.css';
+import getFavicon from '../utils/getFavicon';
 
 export default class Editor extends Component {
 
@@ -20,6 +21,7 @@ export default class Editor extends Component {
   onSave = (title, starmark) => {
     this.props.actions.addStarmark({
       title,
+      rating: starmark.rating,
       url: starmark.url
     });
     this.setState({ isEditing: false });
@@ -39,7 +41,10 @@ export default class Editor extends Component {
             ? <div className={style.title} onDoubleClick={() => this.setState({ isEditing: true })}>{starmark.title}</div>
             : <StarmarkTextInput text={starmark.title} onSave={title => this.onSave(title, starmark)} />
         }
-        <div className={style.url}>{starmark.url}</div>
+        <div className={style.urlBlock}>
+          <span className={style.favicon}><img alt="" src={getFavicon(starmark.url)} /></span>
+          <span className={style.url}>{starmark.url}</span>
+        </div>
         {/* <button onClick={this.seeStars}>Explore Starmarks</button> */}
       </div>
     );

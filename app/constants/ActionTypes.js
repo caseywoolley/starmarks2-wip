@@ -21,3 +21,5 @@ export const RESET_QUERY = 'RESET_QUERY';
 export const RESET_SEARCH = 'RESET_SEARCH';
 
 export const REFRESH_STATE = 'REFRESH_STATE';
+
+export const SET_SELECTION = 'SET_SELECTION';

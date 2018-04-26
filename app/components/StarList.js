@@ -1,10 +1,16 @@
 import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import TableDragSelect from "react-table-drag-select";
 import Waypoint from 'react-waypoint';
 import classnames from 'classnames';
 import _ from 'lodash';
 
+import * as TodoActions from '../actions/todos';
 import './StarList.css';
+
+import searchResults from '../utils/searchResults';
+
 
 import Starmark from './Starmark';
 import style from './StarList.css';
@@ -15,6 +21,18 @@ const getCellsArray = num => _.times(num, () => { return [false] });
 const getSelected = (results, cells) => _.filter(results, (result, i) => cells[i] && cells[i][0]);
 const resultsHaveChanged = (results, newResults) => _.get(results[0], 'title') !== _.get(newResults[0], 'title') || results.length !== newResults.length;
 
+let mouseDown;
+
+@connect(
+  state => ({
+    starmarks: state.starmarks,
+    tags: state.tags,
+    search: state.search
+  }),
+  dispatch => ({
+    actions: bindActionCreators(TodoActions, dispatch)
+  })
+)
 export default class StarList extends Component {
 
   static propTypes = {
@@ -28,7 +46,8 @@ export default class StarList extends Component {
     this.state = {
       displayLimit: LIMIT,
       cells: getCellsArray(LIMIT),
-      selected: []
+      selected: [],
+      canSelect: true
     };
   }
 
@@ -55,14 +74,6 @@ export default class StarList extends Component {
     }
   }
 
-  // updateSearch = (update) => {
-  //   console.log(update)
-  //   this.setState({
-  //     search: update.title,
-  //     // displayLimit: 30
-  //   });
-  // }
-
   updateSort = (newSort) => {
     const { search } = this.props;
     const { updateSearch } = this.props.actions;
@@ -76,29 +87,55 @@ export default class StarList extends Component {
   }
 
   updateSelection = (cells) => {
-    const { results, setSelection } = this.props;
-    const selected = getSelected(results, cells);
-    setSelection(selected);
-    console.log(selected)
-    this.setState({ cells, selected });
+    if (this.state.canSelect) {
+      const { results, setSelection } = this.props;
+      const selected = getSelected(results, cells);
+      setSelection(selected);
+      console.log(selected)
+      this.setState({ cells, selected });
+    }
+  }
+
+  handleMouseOver = (e) => {
+    if (!mouseDown) {
+      this.setState({
+        canSelect: !(e.target.title || e.target.href)
+      });
+      console.log(e.target.title, this.state.canSelect)
+    }
+  }
+
+  handleMouseDown = () => {
+    mouseDown = true;
+  }
+
+  handleMouseUp = () => {
+    mouseDown = false;
   }
 
   render() {
-    const { tags, results, actions, setSelection } = this.props;
+    console.log('render')
+    const { tags, actions, setSelection, starmarks, search } = this.props;
     const { displayLimit, cells } = this.state;
+    const results = searchResults(starmarks, tags, search);
     const limitedResults = results.slice(0, displayLimit);
+    const refResults = _.map(limitedResults, result => starmarks[result.url]);
+    // console.log(results[0].rating);
     // const results = filterStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         <TableDragSelect
-          className={style.selectableTable}
+          className={classnames({ [style.selectableTable]: true, [style.selectable]: this.state.canSelect })}
           value={this.state.cells}
           onChange={this.updateSelection}
+          onMouseOver={this.handleMouseOver}
+          onMouseDown={this.handleMouseDown}
+          onMouseUp={this.handleMouseUp}
         >
           {_.map(limitedResults, (starmark, i) => (
-            <tr key={starmark.url}>
-              <td  className={classnames({ [style.oddRow]: !(i % 2) })}>
-                <div><Starmark starmark={starmark} tags={tags} actions={actions} /></div>
+            <tr key={starmark.url + starmark.rating}>
+              <td className={classnames({ [style.oddRow]: !(i % 2) })}>
+                <div className={style.row}><Starmark starmark={starmark} tags={tags} actions={actions} /></div>
               </td>
             </tr>
           ))}

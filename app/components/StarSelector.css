@@ -21,6 +21,7 @@
   font-family: FontAwesome;
   display: inline-block;
   content: "\f005";
+  cursor: pointer;
 }
 
 .rating > label {

@@ -1,3 +1,4 @@
+import { wrapStore } from 'react-chrome-redux';
 import * as TodoActions from '../../app/actions/todos';
 import createStore from '../../app/store/configureStore';
 import { getState, stateRefresh, updateStarmarkBookmark } from '../../app/utils/bookmarkStorage';
@@ -20,29 +21,31 @@ const addVisitListener = async (callback) => {
   });
 };
 
-const logResponse = (response) => {
-  console.log(response.message);
-};
+// const logResponse = (response) => {
+//   console.log(response.message);
+// };
 
-const updateStateOffline = (response, store, starmark) => {
-  store.dispatch(TodoActions.addStarmark(starmark));
-  // updateStarmarkBookmark(starmark);
-};
+// const updateStateOffline = (response, store, starmark) => {
+//   store.dispatch(TodoActions.addStarmark(starmark));
+//   // updateStarmarkBookmark(starmark);
+// };
 
-const saveStarmark = (starmark, store) => {
-  // updateStateOffline(null, store, starmark);
-  // chrome.runtime.sendMessageAsync({ message: 'refreshState' });
-  chrome.runtime.sendMessageAsync({ message: 'addStarmark', starmark })
-      .then(logResponse)
-      .catch(response => updateStateOffline(response, store, starmark));
-};
+// const saveStarmark = (starmark, store) => {
+//   // updateStateOffline(null, store, starmark);
+//   // chrome.runtime.sendMessageAsync({ message: 'refreshState' });
+//   chrome.runtime.sendMessageAsync({ message: 'addStarmark', starmark })
+//       .then(logResponse)
+//       .catch(response => updateStateOffline(response, store, starmark));
+// };
 
 const initialize = () => {
   getState((state) => {
     const store = createStore(state);
+    wrapStore(store, { portName: 'STARMARKS' });
     stateRefresh(store);
     addVisitListener((visitedStarmark) => {
-      saveStarmark(visitedStarmark, store);
+      store.dispatch(TodoActions.addStarmark(visitedStarmark));
+      // saveStarmark(visitedStarmark, store);
     });
   });
 };

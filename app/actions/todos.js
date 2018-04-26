@@ -44,6 +44,10 @@ export function refreshState() {
   return { type: types.REFRESH_STATE };
 }
 
+export function setSelection(selection) {
+  return { type: types.SET_SELECTION, selection };
+}
+
 // export function addTodo(text) {
 //   return { type: types.ADD_TODO, text };
 // }

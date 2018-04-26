@@ -97,6 +97,14 @@ span.url {
   padding-right: 10px;
 }
 
+/* .tag{
+  border: 1px solid #dee2e5;
+  border-radius: 5px;
+  padding: 6px 15px;
+  color: #fff;
+  background-color: #63d3e1;
+} */
+
 .editIcon {
   visibility: hidden;
   flex: 0 0 16px;

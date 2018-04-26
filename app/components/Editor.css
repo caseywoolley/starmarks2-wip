@@ -16,4 +16,12 @@
 .url {
   font-size: 14px;
   color: grey;
+  align-content: center;
+  flex: 1;
+  padding-left: 5px;
+}
+
+.urlBlock {
+  display: flex;
+  align-items: center;
 }

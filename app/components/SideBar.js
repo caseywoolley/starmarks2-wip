@@ -10,7 +10,8 @@ import style from './SideBar.css';
 @connect(
   state => ({
     search: state.search,
-    starmarks: state.starmarks
+    starmarks: state.starmarks,
+    selection: state.ui.selection
   }),
   dispatch => ({
     actions: bindActionCreators(TodoActions, dispatch)
@@ -19,15 +20,19 @@ import style from './SideBar.css';
 export default class SideBar extends Component {
 
   static propTypes = {
-    updateSearch: PropTypes.func.isRequired,
+    // updateSearch: PropTypes.func.isRequired,
     search: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
-    foundCount: PropTypes.number.isRequired
+    // foundCount: PropTypes.number.isRequired
   };
 
   render() {
-    const { selection, actions } = this.props;
-    const starmark = selection[0];
+    const { selection, actions, starmarks } = this.props;
+    const starmark = selection.length ? starmarks[selection[0].url] : null;
+    if (starmark) {
+      console.log(starmark.rating)
+    }
+
     return (
       <div className={style.fixedContainer}>
           { starmark &&

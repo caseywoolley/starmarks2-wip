@@ -43,7 +43,7 @@ const filterRange = (arr, val, field, isDate) => _.filter(arr, (item) => {
 const starmarksToResults = (starmarks, tags) => _.reduce(starmarks, (results, starmark) => {
   results.push({
     ...starmark,
-    tags: _.map(starmark.tags, id => (tags[id] || { id })),
+    tags: _.map(starmark.tags, id => (tags[id] || { id }))
   });
   return results;
 }, []);

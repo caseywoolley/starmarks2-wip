@@ -6,9 +6,9 @@
   min-width: 800px; */
 }
 
-.list > td {
+.starlist .row {
   cursor: pointer;
-  border-top: 1px solid rgb(235, 235, 235);
+  /* border-top: 1px solid rgb(235, 235, 235); */
 }
 
 .heading {
@@ -21,6 +21,9 @@
 
 .oddRow {
   background: #f9f9f9;
+  border-top: 1px solid rgb(235, 235, 235);
+  border-bottom: 1px solid rgb(235, 235, 235);
+
 }
 
 .selectableTable {
@@ -30,7 +33,9 @@
 /* .selected {
   background: #ebf4fb;
 } */
+.selectable {
 
+}
 /* Cells that can be interacted with */
 :global(.table-drag-select) :global(td.cell-enabled) {
 
@@ -43,12 +48,14 @@
 
 /* Cells that have been selected */
 .selectableTable :global(td.cell-selected) {
-  background-color: #fbead7;
+  background-color: #ffdebb;
+
 }
 
 /* Cells that are in the process of being selected */
-.selectableTable :global(td.cell-being-selected) {
-  background-color: #ffdebb;
+.selectableTable.selectable :global(td.cell-being-selected) {
+  background-color: #fbead7;
+
 }
 
 /* Cells in first row */

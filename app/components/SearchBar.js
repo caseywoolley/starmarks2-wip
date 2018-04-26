@@ -31,6 +31,13 @@ export default class SearchBar extends Component {
     foundCount: PropTypes.number.isRequired
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      query: this.props.search.query || ''
+    };
+  }
+
   getCurrentInput = () => (this.lastFilterInput ? this.lastFilterInput : this.searchInput);
   filterIsEmpty = index => !this.props.search.filters[index];
 
@@ -38,6 +45,9 @@ export default class SearchBar extends Component {
     const { resetQuery, addFilter } = this.props.actions;
     const { search } = this.props;
     e.preventDefault();
+    this.setState({
+      query: ''
+    });
     resetQuery();
     const selectedFilter = searchFilters(search.query)[0];
     if (selectedFilter) {
@@ -85,6 +95,9 @@ export default class SearchBar extends Component {
   }
 
   handleChange = (e) => {
+    this.setState({
+      query: e.target.value
+    });
     this.props.actions.updateSearch({ query: e.target.value });
   }
 
@@ -176,10 +189,10 @@ export default class SearchBar extends Component {
                     onChange={this.handleChange}
                     onKeyDown={this.handleSearchKeyDown}
                     onFocus={this.handleFocus}
-                    value={search.query}
+                    value={this.state.query}
                   />
                   <div className={style.filterOptions}>
-                    {_.map(searchFilters(search.query), result =>
+                    {_.map(searchFilters(this.state.query), result =>
                       <div key={result.key}>{result.name}</div>
                     )}
                   </div>

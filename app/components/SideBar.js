@@ -11,6 +11,7 @@ import style from './SideBar.css';
   state => ({
     search: state.search,
     starmarks: state.starmarks,
+    tags: state.tags,
     selection: state.ui.selection
   }),
   dispatch => ({
@@ -27,7 +28,7 @@ export default class SideBar extends Component {
   };
 
   render() {
-    const { selection, actions, starmarks } = this.props;
+    const { selection, actions, starmarks, tags } = this.props;
     const starmark = selection.length ? starmarks[selection[0].url] : null;
     if (starmark) {
       console.log(starmark.rating)
@@ -35,11 +36,18 @@ export default class SideBar extends Component {
 
     return (
       <div className={style.fixedContainer}>
+        <div className={style.content}>
           { starmark &&
-              <div className={style.popup}>
-                <Editor starmark={starmark} actions={actions} />
-              </div>
+            <div className={style.popup}>
+              <Editor starmark={starmark} actions={actions} />
+            </div>
           }
+          <ul className={style.tagsContainer}>
+            {_.map(tags, tag => (
+              <li onClick={() => actions.addFilter({ tags: tag.title })} className={style.tag} key={tag.id}>{tag.title}</li>
+            ))}
+          </ul>
+        </div>
       </div>
     );
   }

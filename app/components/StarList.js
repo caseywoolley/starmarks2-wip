@@ -21,7 +21,7 @@ const getCellsArray = num => _.times(num, () => { return [false] });
 const getSelected = (results, cells) => _.filter(results, (result, i) => cells[i] && cells[i][0]);
 const resultsHaveChanged = (results, newResults) => _.get(results[0], 'title') !== _.get(newResults[0], 'title') || results.length !== newResults.length;
 
-let mouseDown;
+let isMouseDown;
 
 @connect(
   state => ({
@@ -97,31 +97,18 @@ export default class StarList extends Component {
   }
 
   handleMouseOver = (e) => {
-    if (!mouseDown) {
+    if (!isMouseDown) {
       this.setState({
         canSelect: !(e.target.title || e.target.href)
       });
-      console.log(e.target.title, this.state.canSelect)
     }
   }
 
-  handleMouseDown = () => {
-    mouseDown = true;
-  }
-
-  handleMouseUp = () => {
-    mouseDown = false;
-  }
-
   render() {
-    console.log('render')
     const { tags, actions, setSelection, starmarks, search } = this.props;
     const { displayLimit, cells } = this.state;
     const results = searchResults(starmarks, tags, search);
     const limitedResults = results.slice(0, displayLimit);
-    const refResults = _.map(limitedResults, result => starmarks[result.url]);
-    // console.log(results[0].rating);
-    // const results = filterStarmarks(starmarks, search).slice(0, displayLimit);
     return (
       <div className={style.starlist}>
         <TableDragSelect
@@ -129,18 +116,17 @@ export default class StarList extends Component {
           value={this.state.cells}
           onChange={this.updateSelection}
           onMouseOver={this.handleMouseOver}
-          onMouseDown={this.handleMouseDown}
-          onMouseUp={this.handleMouseUp}
+          onMouseDown={() => (isMouseDown = true)}
+          onMouseUp={() => (isMouseDown = false)}
         >
           {_.map(limitedResults, (starmark, i) => (
             <tr key={starmark.url + starmark.rating}>
-              <td className={classnames({ [style.oddRow]: !(i % 2) })}>
-                <div className={style.row}><Starmark starmark={starmark} tags={tags} actions={actions} /></div>
+              <td className={classnames({ [style.oddRow]: !(i % 2), [style.row]: true })}>
+                <Starmark starmark={starmark} tags={tags} actions={actions} />
               </td>
             </tr>
           ))}
         </TableDragSelect>
-
         <Waypoint key={displayLimit} onEnter={() => this.loadMore()} />
       </div>
     );

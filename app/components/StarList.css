@@ -48,13 +48,13 @@
 
 /* Cells that have been selected */
 .selectableTable :global(td.cell-selected) {
-  background-color: #ffdebb;
+  background-color: #d8f4ff;
 
 }
 
 /* Cells that are in the process of being selected */
 .selectableTable.selectable :global(td.cell-being-selected) {
-  background-color: #fbead7;
+  background-color: #ecfaff;
 
 }
 

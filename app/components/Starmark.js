@@ -48,9 +48,9 @@ export default class Starmark extends Component {
                 <NewTabLink url={starmark.url}><span title={starmark.url}>{starmark.url}</span></NewTabLink>
               </span> */}
             </div>
-            {/* <div className={style.tagRow}>
+            <div className={style.tagRow}>
               { (starmark.tags || []).map(tag => <span onClick={() => addFilter({ tags: tag.title })} className={style.tag} key={tag.id}>{tag.title}</span>) }
-            </div> */}
+            </div>
           </span>
           <span className={[style.stars, style.rating].join(' ')}>
             <StarSelector starmark={starmark} />
